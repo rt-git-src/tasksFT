@@ -37,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.net.toUri
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.rustamft.tasksft.R
 import com.rustamft.tasksft.domain.model.Preferences
@@ -48,7 +49,7 @@ import com.rustamft.tasksft.presentation.navigation.TopBar
 import com.rustamft.tasksft.presentation.theme.DIMEN_SMALL
 import org.koin.androidx.compose.koinViewModel
 
-@Destination(route = ROUTE_SETTINGS)
+@Destination<RootGraph>(route = ROUTE_SETTINGS)
 @Composable
 fun SettingsScreen(
     navigator: DestinationsNavigator, // From ComposeDestinations

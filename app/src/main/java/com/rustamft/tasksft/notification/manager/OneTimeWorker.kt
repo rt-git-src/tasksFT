@@ -5,6 +5,7 @@ import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
@@ -12,19 +13,21 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.rustamft.tasksft.R
 import com.rustamft.tasksft.notification.receiver.TaskBroadcastReceiver
+import com.rustamft.tasksft.permission.isNotificationPermissionGranted
 import com.rustamft.tasksft.presentation.activity.MainActivity
 import com.rustamft.tasksft.presentation.global.DEEP_LINK_URI
 import com.rustamft.tasksft.presentation.global.NOTIFICATION_ACTION_FINISH_TASK
 import com.rustamft.tasksft.presentation.global.NOTIFICATION_ACTION_SNOOZE_TASK
 import com.rustamft.tasksft.presentation.global.NOTIFICATION_CHANNEL_ID_TASK
+import com.rustamft.tasksft.presentation.global.TAG_PERMISSION_EXCEPTION
 import com.rustamft.tasksft.presentation.global.TASK_DESCRIPTION
 import com.rustamft.tasksft.presentation.global.TASK_ID
 import com.rustamft.tasksft.presentation.global.TASK_TITLE
-import com.rustamft.tasksft.presentation.screen.destinations.EditorScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.EditorScreenDestination
 
 class OneTimeWorker(
     private val context: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
 ) : Worker(context, workerParams) {
 
     private val data = workerParams.inputData
@@ -38,7 +41,9 @@ class OneTimeWorker(
     }
 
     override fun doWork(): Result {
-        displayNotification()
+        if (applicationContext.isNotificationPermissionGranted()) {
+            displayNotification()
+        }
         return Result.success()
     }
 
@@ -52,7 +57,11 @@ class OneTimeWorker(
             .addAction(buildFinishAction())
             .addAction(buildSnoozeAction())
             .setAutoCancel(true)
-        NotificationManagerCompat.from(context).notify(taskId, notification.build())
+        try {
+            NotificationManagerCompat.from(context).notify(taskId, notification.build())
+        } catch (e: SecurityException) {
+            Log.e(TAG_PERMISSION_EXCEPTION, Log.getStackTraceString(e))
+        }
     }
 
     private fun buildMainPendingIntent(): PendingIntent {

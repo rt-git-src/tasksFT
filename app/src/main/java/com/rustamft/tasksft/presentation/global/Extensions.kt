@@ -19,14 +19,14 @@ internal fun Long.toDateTime(): DateTime {
     val date = "${
         calendar.get(Calendar.DAY_OF_MONTH)
     } ${
-    calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
+        calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
     } ${
-    calendar.get(Calendar.YEAR)
+        calendar.get(Calendar.YEAR)
     }"
     val time = "${
-    String.format("%02d", calendar.get(Calendar.HOUR_OF_DAY))
+        String.format(Locale.getDefault(), "%02d", calendar.get(Calendar.HOUR_OF_DAY))
     }:${
-    String.format("%02d", calendar.get(Calendar.MINUTE))
+        String.format(Locale.getDefault(), "%02d", calendar.get(Calendar.MINUTE))
     }"
 
     return DateTime(

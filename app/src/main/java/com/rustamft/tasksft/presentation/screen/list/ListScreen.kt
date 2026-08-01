@@ -45,6 +45,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.EditorScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.rustamft.tasksft.BuildConfig
 import com.rustamft.tasksft.R
@@ -63,7 +65,6 @@ import com.rustamft.tasksft.presentation.model.TaskViewState
 import com.rustamft.tasksft.presentation.navigation.Fab
 import com.rustamft.tasksft.presentation.navigation.NavItem
 import com.rustamft.tasksft.presentation.navigation.TopBar
-import com.rustamft.tasksft.presentation.screen.destinations.EditorScreenDestination
 import com.rustamft.tasksft.presentation.theme.AppTheme
 import com.rustamft.tasksft.presentation.theme.DIMEN_SMALL
 import com.rustamft.tasksft.presentation.theme.DIMEN_ZERO
@@ -73,7 +74,7 @@ import com.rustamft.tasksft.presentation.theme.TEXT_SMALL
 import org.koin.androidx.compose.koinViewModel
 import java.util.Calendar
 
-@Destination(start = true, route = ROUTE_LIST)
+@Destination<RootGraph>(start = true, route = ROUTE_LIST)
 @Composable
 fun ListScreen(
     navigator: DestinationsNavigator, // From ComposeDestinations
