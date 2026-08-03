@@ -19,7 +19,7 @@ import com.rustamft.tasksft.presentation.global.NOTIFICATION_CHANNEL_ID_TASK
 import com.rustamft.tasksft.presentation.global.TASK_DESCRIPTION
 import com.rustamft.tasksft.presentation.global.TASK_ID
 import com.rustamft.tasksft.presentation.global.TASK_TITLE
-import com.rustamft.tasksft.presentation.screen.destinations.EditorScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.EditorScreenDestination
 
 class RepetitiveWorker(
     private val context: Context,

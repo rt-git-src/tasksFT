@@ -3,11 +3,15 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
     id("kotlin-parcelize")
+    alias(libs.plugins.ktlint)
     alias(libs.plugins.ksp)
-    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
+    alias(libs.plugins.kotlin.compose)
 }
 
 kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
     sourceSets {
         debug {
             kotlin.srcDir("build/generated/ksp/debug/kotlin")
@@ -19,11 +23,11 @@ kotlin {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 37
     defaultConfig {
         applicationId = "com.rustamft.tasksft"
-        minSdk = 21
-        targetSdk = 34
+        minSdk = 23
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0.10"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -45,14 +49,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
     buildFeatures {
+        buildConfig = true
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
     packaging {
         resources {

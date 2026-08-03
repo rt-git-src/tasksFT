@@ -26,6 +26,7 @@ internal const val NOTIFICATION_ACTION_REPEAT_TASK =
     "com.rustamft.tasksft.notification_action_repeat_task"
 
 internal const val TAG_COROUTINE_EXCEPTION = "tag_coroutine_exception"
+internal const val TAG_PERMISSION_EXCEPTION = "tag_permission_exception"
 internal const val TAG_LIST_SCREEN = "list_screen"
 internal const val TAG_LIST_SCREEN_FAB = "list_screen_fab"
 internal const val TAG_LIST_SCREEN_TASK_CARD = "list_screen_task_card"

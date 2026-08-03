@@ -1,6 +1,5 @@
 package com.rustamft.tasksft.presentation.screen.list
 
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -44,8 +43,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.net.toUri
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.EditorScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.spec.Direction
 import com.rustamft.tasksft.BuildConfig
 import com.rustamft.tasksft.R
 import com.rustamft.tasksft.domain.model.Preferences.Theme
@@ -63,7 +66,6 @@ import com.rustamft.tasksft.presentation.model.TaskViewState
 import com.rustamft.tasksft.presentation.navigation.Fab
 import com.rustamft.tasksft.presentation.navigation.NavItem
 import com.rustamft.tasksft.presentation.navigation.TopBar
-import com.rustamft.tasksft.presentation.screen.destinations.EditorScreenDestination
 import com.rustamft.tasksft.presentation.theme.AppTheme
 import com.rustamft.tasksft.presentation.theme.DIMEN_SMALL
 import com.rustamft.tasksft.presentation.theme.DIMEN_ZERO
@@ -73,12 +75,12 @@ import com.rustamft.tasksft.presentation.theme.TEXT_SMALL
 import org.koin.androidx.compose.koinViewModel
 import java.util.Calendar
 
-@Destination(start = true, route = ROUTE_LIST)
+@Destination<RootGraph>(start = true, route = ROUTE_LIST)
 @Composable
 fun ListScreen(
     navigator: DestinationsNavigator, // From ComposeDestinations
     scaffoldState: ScaffoldState, // From DependenciesContainer
-    viewModel: ListViewModel = koinViewModel()
+    viewModel: ListViewModel = koinViewModel(),
 ) {
 
     val listOfTasksState = viewModel.listOfTasksFlow.collectAsState(initial = emptyList())
@@ -88,8 +90,8 @@ fun ListScreen(
         tasks = listOfTasksState,
         openAppInfoDialog = viewModel.openAppInfoDialogState,
         openGitHub = viewModel.openGitHubState,
-        onNavigateToSettings = { navigator.navigate(ROUTE_SETTINGS) },
-        onNavigateToEditorNewTask = { navigator.navigate(ROUTE_EDITOR) },
+        onNavigateToSettings = { navigator.navigate(Direction(ROUTE_SETTINGS)) },
+        onNavigateToEditorNewTask = { navigator.navigate(Direction(ROUTE_EDITOR)) },
         onNavigateToEditorExistingTask = { id ->
             navigator.navigate(EditorScreenDestination(taskId = id))
         },
@@ -299,7 +301,7 @@ private fun ListScreenContent(
 
         if (openGitHub.value) {
             val uriHandler = LocalUriHandler.current
-            val uri = Uri.parse(GITHUB_LINK)
+            val uri = GITHUB_LINK.toUri()
             uriHandler.openUri(uri.toString())
             openGitHub.value = false
         }

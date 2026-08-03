@@ -35,9 +35,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.os.bundleOf
-import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.FULL_ROUTE_PLACEHOLDER
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.annotation.parameters.DeepLink
+import com.ramcosta.composedestinations.annotation.parameters.FULL_ROUTE_PLACEHOLDER
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.rustamft.tasksft.R
 import com.rustamft.tasksft.domain.model.Preferences.Theme
@@ -64,7 +65,7 @@ import com.rustamft.tasksft.presentation.theme.Shapes
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-@Destination(
+@Destination<RootGraph>(
     route = ROUTE_EDITOR,
     deepLinks = [DeepLink(uriPattern = "$DEEP_LINK_URI$FULL_ROUTE_PLACEHOLDER")]
 )
@@ -75,7 +76,7 @@ fun EditorScreen(
     taskId: Int?,
     viewModel: EditorViewModel = koinViewModel(
         parameters = { parametersOf(bundleOf(Pair(TASK_ID, taskId))) }
-    )
+    ),
 ) {
 
     LaunchedEffect(key1 = viewModel) {
@@ -109,7 +110,7 @@ private fun EditorScreenContent(
     valueChangedState: MutableState<Boolean>,
     onNavigateBack: () -> Unit,
     onSaveTask: () -> Unit,
-    onDeleteTask: () -> Unit
+    onDeleteTask: () -> Unit,
 ) {
 
     val task by taskViewState
