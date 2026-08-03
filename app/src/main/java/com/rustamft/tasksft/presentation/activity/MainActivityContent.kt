@@ -17,15 +17,15 @@ import com.rustamft.tasksft.domain.model.Preferences
 import com.rustamft.tasksft.domain.usecase.GetPreferencesUseCase
 import com.rustamft.tasksft.presentation.global.SnackbarFlow
 import com.rustamft.tasksft.presentation.theme.AppTheme
-import org.koin.androidx.compose.get
+import org.koin.compose.koinInject
 
 @Composable
 fun MainActivityContent(
     context: Context = LocalContext.current,
-    snackbarFlow: SnackbarFlow = get(),
+    snackbarFlow: SnackbarFlow = koinInject(),
     scaffoldState: ScaffoldState = rememberScaffoldState(),
     navController: NavHostController = rememberNavController(),
-    getPreferencesUseCase: GetPreferencesUseCase = get()
+    getPreferencesUseCase: GetPreferencesUseCase = koinInject(),
 ) {
 
     val preferences by getPreferencesUseCase.execute().collectAsState(initial = Preferences())
