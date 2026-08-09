@@ -12,7 +12,7 @@ import kotlinx.coroutines.withContext
 
 internal class PreferencesRepositoryImpl(
     private val preferencesStorage: PreferencesStorage,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : PreferencesRepository {
 
     override suspend fun savePreferences(preferences: Preferences) {

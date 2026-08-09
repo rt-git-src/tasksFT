@@ -21,26 +21,25 @@ import org.junit.runner.RunWith
 import kotlin.random.Random
 
 @RunWith(AndroidJUnit4::class)
-class ListScreenTest : TestCase(
-    kaspressoBuilder = Kaspresso.Builder.withComposeSupport(
-        customize = {
-            flakySafetyParams = FlakySafetyParams.custom(timeoutMs = 5000, intervalMs = 1000)
-        },
-        lateComposeCustomize = { composeBuilder ->
-            composeBuilder.semanticsBehaviorInterceptors =
-                composeBuilder.semanticsBehaviorInterceptors.filter {
-                    it !is SystemDialogSafetySemanticsBehaviorInterceptor
-                }.toMutableList()
-        }
-    )
-) {
-
+class ListScreenTest :
+    TestCase(
+        kaspressoBuilder = Kaspresso.Builder.withComposeSupport(
+            customize = {
+                flakySafetyParams = FlakySafetyParams.custom(timeoutMs = 5000, intervalMs = 1000)
+            },
+            lateComposeCustomize = { composeBuilder ->
+                composeBuilder.semanticsBehaviorInterceptors = composeBuilder.semanticsBehaviorInterceptors
+                    .filter {
+                        it !is SystemDialogSafetySemanticsBehaviorInterceptor
+                    }.toMutableList()
+            },
+        ),
+    ) {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
     @Test
     fun taskIsCreatedAndRemovedCorrectly() = run {
-
         val taskTitle = "Task ${Random.nextInt(999999999)}"
 
         step("Click add FAB") {
@@ -89,6 +88,36 @@ class ListScreenTest : TestCase(
                 text {
                     assertDoesNotExist()
                 }
+            }
+        }
+    }
+
+    @Test
+    fun settingsKeepExistingThemeAndBackupInteractions() = run {
+        step("Open settings") {
+            onComposeScreen<ListScreen>(composeTestRule) {
+                settingsTopBarAction {
+                    assertIsDisplayed()
+                    performClick()
+                }
+            }
+        }
+        step("Use the existing theme-cycle interaction") {
+            onComposeScreen<com.rustamft.tasksft.screen.SettingsScreen>(composeTestRule) {
+                themeControl {
+                    assertIsDisplayed()
+                    performClick()
+                }
+                exportAction { assertIsDisplayed() }
+                restoreAction { assertIsDisplayed() }
+            }
+        }
+        step("Return to the task list") {
+            onComposeScreen<com.rustamft.tasksft.screen.SettingsScreen>(composeTestRule) {
+                backTopBarAction { performClick() }
+            }
+            onComposeScreen<ListScreen>(composeTestRule) {
+                addFab { assertIsDisplayed() }
             }
         }
     }

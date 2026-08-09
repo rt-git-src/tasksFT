@@ -9,5 +9,5 @@ data class Task(
     val reminder: Long,
     val repeatCalendarUnit: Int,
     val finished: Boolean,
-    val color: Int
+    val color: Int,
 )

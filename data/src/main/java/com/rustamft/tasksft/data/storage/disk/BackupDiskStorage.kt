@@ -17,13 +17,13 @@ import java.io.FileOutputStream
 import java.io.InputStreamReader
 
 internal class BackupDiskStorage(
-    private val context: Context
+    private val context: Context,
 ) : BackupStorage {
 
     override suspend fun save(
         fileName: String,
         tasks: List<TaskData>,
-        directoryUri: Uri
+        directoryUri: Uri,
     ) {
         val file = createFile(fileName = fileName, directoryUri = directoryUri)
         val descriptor = context.contentResolver.openFileDescriptor(file!!.uri, "wt")!!

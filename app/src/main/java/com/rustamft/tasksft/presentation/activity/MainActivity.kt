@@ -8,15 +8,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
+import androidx.core.view.WindowCompat
 import com.rustamft.tasksft.R
 import com.rustamft.tasksft.permission.isNotificationPermissionGranted
 import com.rustamft.tasksft.permission.requestNotificationPermission
 import com.rustamft.tasksft.presentation.global.NOTIFICATION_CHANNEL_ID_TASK
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannelIfNeeded()
         }
@@ -38,10 +39,10 @@ class MainActivity : ComponentActivity() {
             NotificationChannel(
                 NOTIFICATION_CHANNEL_ID_TASK,
                 getString(R.string.task_notification_channel_name),
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_HIGH,
             ).apply {
                 description = getString(R.string.task_notification_channel_description)
-            }
+            },
         )
     }
 }

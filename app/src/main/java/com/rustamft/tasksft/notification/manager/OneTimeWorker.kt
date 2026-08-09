@@ -11,6 +11,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.ramcosta.composedestinations.generated.destinations.EditorScreenDestination
 import com.rustamft.tasksft.R
 import com.rustamft.tasksft.notification.receiver.TaskBroadcastReceiver
 import com.rustamft.tasksft.permission.isNotificationPermissionGranted
@@ -23,7 +24,6 @@ import com.rustamft.tasksft.presentation.global.TAG_PERMISSION_EXCEPTION
 import com.rustamft.tasksft.presentation.global.TASK_DESCRIPTION
 import com.rustamft.tasksft.presentation.global.TASK_ID
 import com.rustamft.tasksft.presentation.global.TASK_TITLE
-import com.ramcosta.composedestinations.generated.destinations.EditorScreenDestination
 
 class OneTimeWorker(
     private val context: Context,

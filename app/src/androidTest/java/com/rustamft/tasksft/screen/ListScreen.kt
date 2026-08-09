@@ -9,16 +9,18 @@ import com.rustamft.tasksft.presentation.global.TAG_LIST_SCREEN_TASK_CARD
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.github.kakaocup.compose.node.element.KNode
 
-class ListScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
-    ComposeScreen<ListScreen>(
-        semanticsProvider = semanticsProvider,
-        viewBuilderAction = { hasTestTag(TAG_LIST_SCREEN) }
-    ) {
-
+class ListScreen(
+    semanticsProvider: SemanticsNodeInteractionsProvider,
+) : ComposeScreen<ListScreen>(
+    semanticsProvider = semanticsProvider,
+    viewBuilderAction = { hasTestTag(TAG_LIST_SCREEN) },
+) {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-
     val cleanTopBarAction = child<KNode> {
         hasContentDescription(this@ListScreen.context.getString(R.string.action_delete_finished))
+    }
+    val settingsTopBarAction = child<KNode> {
+        hasContentDescription(this@ListScreen.context.getString(R.string.action_settings))
     }
     val addFab = child<KNode> {
         hasTestTag(TAG_LIST_SCREEN_FAB)

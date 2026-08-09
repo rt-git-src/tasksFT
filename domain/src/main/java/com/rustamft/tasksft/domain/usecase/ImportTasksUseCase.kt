@@ -10,7 +10,7 @@ import kotlinx.coroutines.supervisorScope
 class ImportTasksUseCase(
     private val backupRepository: BackupRepository,
     private val tasksRepository: TaskRepository,
-    private val taskNotificationScheduler: TaskNotificationScheduler
+    private val taskNotificationScheduler: TaskNotificationScheduler,
 ) {
 
     suspend fun execute(fileUriString: String) {

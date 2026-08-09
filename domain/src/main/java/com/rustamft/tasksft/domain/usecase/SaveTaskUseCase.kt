@@ -8,7 +8,7 @@ import kotlinx.coroutines.supervisorScope
 
 class SaveTaskUseCase(
     private val taskRepository: TaskRepository,
-    private val taskNotificationScheduler: TaskNotificationScheduler
+    private val taskNotificationScheduler: TaskNotificationScheduler,
 ) {
 
     @Throws(Exception::class)

@@ -69,7 +69,7 @@ class EditorViewModel(
 
     private fun launchInViewModelScope(
         successMessage: UIText? = null,
-        block: suspend CoroutineScope.() -> Unit
+        block: suspend CoroutineScope.() -> Unit,
     ) {
         viewModelScope.launch(exceptionHandler) {
             launch { block() }.join()

@@ -5,7 +5,7 @@ import com.rustamft.tasksft.domain.repository.TaskRepository
 import kotlinx.coroutines.flow.Flow
 
 class GetTaskUseCase(
-    private val taskRepository: TaskRepository
+    private val taskRepository: TaskRepository,
 ) {
 
     fun execute(taskId: Int): Flow<Task?> = taskRepository.get(taskId = taskId)

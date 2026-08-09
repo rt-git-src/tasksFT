@@ -10,6 +10,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.ramcosta.composedestinations.generated.destinations.EditorScreenDestination
 import com.rustamft.tasksft.R
 import com.rustamft.tasksft.notification.receiver.TaskBroadcastReceiver
 import com.rustamft.tasksft.presentation.activity.MainActivity
@@ -19,11 +20,10 @@ import com.rustamft.tasksft.presentation.global.NOTIFICATION_CHANNEL_ID_TASK
 import com.rustamft.tasksft.presentation.global.TASK_DESCRIPTION
 import com.rustamft.tasksft.presentation.global.TASK_ID
 import com.rustamft.tasksft.presentation.global.TASK_TITLE
-import com.ramcosta.composedestinations.generated.destinations.EditorScreenDestination
 
 class RepetitiveWorker(
     private val context: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
 ) : Worker(context, workerParams) {
 
     private val data = workerParams.inputData

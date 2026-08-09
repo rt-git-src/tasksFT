@@ -29,7 +29,7 @@ android {
         minSdk = 23
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0.10"
+        versionName = "1.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -41,7 +41,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -74,6 +74,7 @@ dependencies {
     implementation(libs.lifecycle.viewmodelCompose)
     // Activity
     implementation(libs.activity.compose)
+    implementation(libs.drawerlayout)
     // Compose
     implementation(libs.compose.ui)
     implementation(libs.compose.uiToolingPreview)

@@ -15,12 +15,11 @@ class ListViewModel(
     getAllTasksUseCase: GetAllTasksUseCase,
     private val saveTaskUseCase: SaveTaskUseCase,
     private val deleteTasksUseCase: DeleteTaskUseCase,
-    private val exceptionHandler: CoroutineExceptionHandler
+    private val exceptionHandler: CoroutineExceptionHandler,
 ) : ViewModel() {
 
     val listOfTasksFlow = getAllTasksUseCase.execute()
     val openAppInfoDialogState = mutableStateOf(false)
-    val openGitHubState = mutableStateOf(false)
 
     fun saveTask(task: Task) {
         launchInViewModelScope { saveTaskUseCase.execute(task = task) }

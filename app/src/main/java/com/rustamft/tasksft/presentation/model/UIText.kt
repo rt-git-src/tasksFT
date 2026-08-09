@@ -8,12 +8,12 @@ import androidx.compose.ui.res.stringResource
 sealed class UIText {
 
     data class DynamicString(
-        val value: String
+        val value: String,
     ) : UIText()
 
     class StringResource(
         @StringRes val resId: Int,
-        vararg val args: Any
+        vararg val args: Any,
     ) : UIText()
 
     @Composable

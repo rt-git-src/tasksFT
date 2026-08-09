@@ -12,13 +12,13 @@ import kotlinx.coroutines.withContext
 
 internal class BackupRepositoryImpl(
     private val backupStorage: BackupStorage,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : BackupRepository {
 
     override suspend fun save(
         fileName: String,
         tasks: List<Task>,
-        directoryUriString: String
+        directoryUriString: String,
     ) {
         withContext(dispatcher) {
             backupStorage.save(

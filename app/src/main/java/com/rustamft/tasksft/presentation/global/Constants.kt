@@ -16,14 +16,10 @@ internal const val ONE_HOUR = 60L * 60L * 1000L
 
 internal const val DEEP_LINK_URI = "https://tasksft.rustamft.com/"
 
-internal const val NOTIFICATION_CHANNEL_ID_TASK =
-    "com.rustamft.tasksft.notification_channel_id_task"
-internal const val NOTIFICATION_ACTION_FINISH_TASK =
-    "com.rustamft.tasksft.notification_action_finish_task"
-internal const val NOTIFICATION_ACTION_SNOOZE_TASK =
-    "com.rustamft.tasksft.notification_action_snooze_task"
-internal const val NOTIFICATION_ACTION_REPEAT_TASK =
-    "com.rustamft.tasksft.notification_action_repeat_task"
+internal const val NOTIFICATION_CHANNEL_ID_TASK = "com.rustamft.tasksft.notification_channel_id_task"
+internal const val NOTIFICATION_ACTION_FINISH_TASK = "com.rustamft.tasksft.notification_action_finish_task"
+internal const val NOTIFICATION_ACTION_SNOOZE_TASK = "com.rustamft.tasksft.notification_action_snooze_task"
+internal const val NOTIFICATION_ACTION_REPEAT_TASK = "com.rustamft.tasksft.notification_action_repeat_task"
 
 internal const val TAG_COROUTINE_EXCEPTION = "tag_coroutine_exception"
 internal const val TAG_PERMISSION_EXCEPTION = "tag_permission_exception"
@@ -33,3 +29,7 @@ internal const val TAG_LIST_SCREEN_TASK_CARD = "list_screen_task_card"
 internal const val TAG_EDITOR_SCREEN = "editor_screen"
 internal const val TAG_EDITOR_SCREEN_FAB = "editor_screen_fab"
 internal const val TAG_EDITOR_SCREEN_EDITTEXT_TITLE = "editor_screen_edittext_title"
+internal const val TAG_SETTINGS_SCREEN = "settings_screen"
+internal const val TAG_SETTINGS_THEME_CONTROL = "settings_theme_control"
+internal const val TAG_SETTINGS_EXPORT = "settings_export"
+internal const val TAG_SETTINGS_RESTORE = "settings_restore"

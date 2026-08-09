@@ -12,7 +12,7 @@ internal data class PreferencesData(
     val id: Int = 0,
     @field:TypeConverters(ThemeTypeConverter::class)
     val theme: Theme = Theme.Auto,
-    val backupDirectory: String = ""
+    val backupDirectory: String = "",
 ) {
 
     object ThemeTypeConverter {

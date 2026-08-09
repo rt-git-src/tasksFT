@@ -9,6 +9,9 @@
     <string name="action_restore">Restore</string>
     <string name="action_save">Save</string>
     <string name="action_settings">Settings</string>
+    <string name="action_new_task">New task</string>
+    <string name="action_export_tasks">Export tasks</string>
+    <string name="action_import_tasks">Import tasks</string>
 
     <string name="app_info">App info</string>
     <string name="app_info_dialog_content">\n
@@ -31,6 +34,10 @@
 
     <string name="now">Now</string>
 
+    <string name="appearance">Appearance</string>
+    <string name="screen_tasks">Tasks</string>
+    <string name="screen_edit_task">Edit task</string>
+
     <string name="reminder">Reminder</string>
     <string name="reminder_daily">daily</string>
     <string name="reminder_weekly">weekly</string>
@@ -38,6 +45,8 @@
     <string name="reminder_in">Reminder in %1$d\d %2$d\h %3$d\m</string>
     <string name="reminder_one_time">one time</string>
     <string name="reminder_repeat">Repeat</string>
+    <string name="reminder_date">Date</string>
+    <string name="reminder_time">Time</string>
 
     <string name="task_color">Task color</string>
     <string name="task_description">Description</string>
@@ -56,4 +65,7 @@
     <string name="theme_auto">System theme</string>
     <string name="theme_dark">Dark theme</string>
     <string name="theme_light">Light theme</string>
+    <string name="theme_auto_short">System</string>
+    <string name="theme_dark_short">Dark</string>
+    <string name="theme_light_short">Light</string>
 </resources>

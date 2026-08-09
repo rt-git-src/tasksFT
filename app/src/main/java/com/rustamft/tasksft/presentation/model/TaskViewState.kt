@@ -26,7 +26,7 @@ class TaskViewState(
         }
     ),
     repeatCalendarUnits: MutableState<Int> = mutableIntStateOf(0),
-    color: MutableState<Color> = mutableStateOf(AppTheme.taskColors.random())
+    color: MutableState<Color> = mutableStateOf(AppTheme.taskColors.random()),
 ) {
 
     val stateRepeatCalendarUnits by lazy { repeatCalendarUnits }

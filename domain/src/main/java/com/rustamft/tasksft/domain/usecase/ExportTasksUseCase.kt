@@ -8,7 +8,7 @@ import java.util.Calendar
 
 class ExportTasksUseCase(
     private val backupRepository: BackupRepository,
-    private val tasksRepository: TaskRepository
+    private val tasksRepository: TaskRepository,
 ) {
 
     private val filePrefix = "tasksFT backup"

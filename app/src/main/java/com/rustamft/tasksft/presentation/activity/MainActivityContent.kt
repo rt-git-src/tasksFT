@@ -15,6 +15,7 @@ import com.ramcosta.composedestinations.generated.NavGraphs
 import com.ramcosta.composedestinations.navigation.dependency
 import com.rustamft.tasksft.domain.model.Preferences
 import com.rustamft.tasksft.domain.usecase.GetPreferencesUseCase
+import com.rustamft.tasksft.presentation.element.AppBackground
 import com.rustamft.tasksft.presentation.global.SnackbarFlow
 import com.rustamft.tasksft.presentation.theme.AppTheme
 import org.koin.compose.koinInject
@@ -27,24 +28,25 @@ fun MainActivityContent(
     navController: NavHostController = rememberNavController(),
     getPreferencesUseCase: GetPreferencesUseCase = koinInject(),
 ) {
-
     val preferences by getPreferencesUseCase.execute().collectAsState(initial = Preferences())
 
     LaunchedEffect(true) {
         snackbarFlow.collect { uiText ->
             scaffoldState.snackbarHostState.showSnackbar(
-                message = uiText.asString(context)
+                message = uiText.asString(context),
             )
         }
     }
 
     AppTheme(theme = preferences.theme) {
-        DestinationsNavHost(
-            navGraph = NavGraphs.root,
-            navController = navController,
-            dependenciesContainerBuilder = {
-                dependency(scaffoldState)
-            }
-        )
+        AppBackground {
+            DestinationsNavHost(
+                navGraph = NavGraphs.root,
+                navController = navController,
+                dependenciesContainerBuilder = {
+                    dependency(scaffoldState)
+                },
+            )
+        }
     }
 }

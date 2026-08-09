@@ -26,7 +26,7 @@ class SettingsViewModel(
     private val exportTasksUseCase: ExportTasksUseCase,
     private val importTasksUseCase: ImportTasksUseCase,
     private val snackbarFlow: SnackbarFlow,
-    private val exceptionHandler: CoroutineExceptionHandler
+    private val exceptionHandler: CoroutineExceptionHandler,
 ) : ViewModel() {
 
     private val successChannel = Channel<Boolean>()
@@ -67,14 +67,14 @@ class SettingsViewModel(
 
     private fun launchInViewModelScope(
         successMessage: UIText? = null,
-        block: suspend CoroutineScope.() -> Unit
+        block: suspend CoroutineScope.() -> Unit,
     ) {
         launchInViewModelScope(successMessage, listOf(block))
     }
 
     private fun launchInViewModelScope(
         successMessage: UIText? = null,
-        blocks: List<suspend CoroutineScope.() -> Unit>
+        blocks: List<suspend CoroutineScope.() -> Unit>,
     ) {
         viewModelScope.launch(exceptionHandler) {
             val jobs = blocks.map { block -> launch { block() } }

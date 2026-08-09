@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit
 
 class TaskNotificationSchedulerImpl(
     private val workManager: WorkManager,
-    private val notificationManager: NotificationManagerCompat
+    private val notificationManager: NotificationManagerCompat,
 ) : TaskNotificationScheduler {
 
     override fun schedule(task: Task) {

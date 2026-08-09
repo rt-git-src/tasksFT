@@ -12,7 +12,7 @@ import java.io.IOException
 
 internal class TaskRepositoryImpl(
     private val taskStorage: TaskStorage,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : TaskRepository {
 
     @Throws(IOException::class, Exception::class)

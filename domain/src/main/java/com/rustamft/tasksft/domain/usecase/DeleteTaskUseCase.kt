@@ -9,7 +9,7 @@ import java.io.IOException
 
 class DeleteTaskUseCase(
     private val taskRepository: TaskRepository,
-    private val taskNotificationScheduler: TaskNotificationScheduler
+    private val taskNotificationScheduler: TaskNotificationScheduler,
 ) {
 
     @Throws(IOException::class, Exception::class)

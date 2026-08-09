@@ -17,5 +17,5 @@ internal data class TaskData(
     val repeatCalendarUnit: Int = 0,
     @ColumnInfo(name = "finished")
     val finished: Boolean = false,
-    val color: Int = 0x00000000
+    val color: Int = 0x00000000,
 )

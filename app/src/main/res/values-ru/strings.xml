@@ -9,6 +9,9 @@
     <string name="action_restore">Восстановить</string>
     <string name="action_save">Сохранить</string>
     <string name="action_settings">Настройки</string>
+    <string name="action_new_task">Новая задача</string>
+    <string name="action_export_tasks">Экспортировать задачи</string>
+    <string name="action_import_tasks">Импортировать задачи</string>
 
     <string name="app_info">Информация о приложении</string>
     <string name="app_info_dialog_content">\n
@@ -31,6 +34,10 @@
 
     <string name="now">Сейчас</string>
 
+    <string name="appearance">Оформление</string>
+    <string name="screen_tasks">Задачи</string>
+    <string name="screen_edit_task">Редактирование</string>
+
     <string name="reminder">Напоминание</string>
     <string name="reminder_daily">ежедневно</string>
     <string name="reminder_weekly">еженедельно</string>
@@ -38,6 +45,8 @@
     <string name="reminder_in">Напоминание через %1$d\д %2$d\ч %3$d\м</string>
     <string name="reminder_one_time">единоразово</string>
     <string name="reminder_repeat">Повторить</string>
+    <string name="reminder_date">Дата</string>
+    <string name="reminder_time">Время</string>
 
     <string name="task_color">Цвет задачи</string>
     <string name="task_description">Описание</string>
@@ -56,4 +65,7 @@
     <string name="theme_auto">Системная тема</string>
     <string name="theme_dark">Темная тема</string>
     <string name="theme_light">Светлая тема</string>
+    <string name="theme_auto_short">Система</string>
+    <string name="theme_dark_short">Тёмная</string>
+    <string name="theme_light_short">Светлая</string>
 </resources>
