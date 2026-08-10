@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import java.util.concurrent.TimeUnit
 
-class TaskNotificationSchedulerImpl(
+internal class TaskNotificationSchedulerImpl(
     private val workManager: WorkManager,
     private val notificationManager: NotificationManagerCompat,
 ) : TaskNotificationScheduler {

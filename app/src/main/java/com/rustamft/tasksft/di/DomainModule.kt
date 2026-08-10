@@ -14,7 +14,7 @@ import com.rustamft.tasksft.domain.usecase.SaveTaskUseCase
 import com.rustamft.tasksft.notification.manager.TaskNotificationSchedulerImpl
 import org.koin.dsl.module
 
-val domainModule = module {
+internal val domainModule = module {
 
     single<TaskNotificationScheduler> {
         TaskNotificationSchedulerImpl(

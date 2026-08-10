@@ -11,7 +11,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class ListViewModel(
+internal class ListViewModel(
     getAllTasksUseCase: GetAllTasksUseCase,
     private val saveTaskUseCase: SaveTaskUseCase,
     private val deleteTasksUseCase: DeleteTaskUseCase,

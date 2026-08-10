@@ -74,7 +74,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Destination<RootGraph>(route = ROUTE_SETTINGS)
 @Composable
-fun SettingsScreen(
+internal fun SettingsScreen(
     navigator: DestinationsNavigator,
     scaffoldState: ScaffoldState,
     viewModel: SettingsViewModel = koinViewModel(),

@@ -9,10 +9,10 @@ import com.rustamft.tasksft.presentation.screen.editor.EditorViewModel
 import com.rustamft.tasksft.presentation.screen.list.ListViewModel
 import com.rustamft.tasksft.presentation.screen.settings.SettingsViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
-val appModule = module {
+internal val appModule = module {
 
     single<SnackbarFlow> {
         SnackbarFlow()

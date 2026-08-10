@@ -27,7 +27,7 @@ import kotlinx.coroutines.withContext
 import org.koin.java.KoinJavaComponent.inject
 import java.util.Calendar
 
-class TaskBroadcastReceiver : BroadcastReceiver() {
+internal class TaskBroadcastReceiver : BroadcastReceiver() {
 
     private val scope = CoroutineScope(Dispatchers.IO)
     private val getTaskUseCase: GetTaskUseCase by inject(GetTaskUseCase::class.java)

@@ -82,7 +82,7 @@ import java.util.Calendar
 
 @Destination<RootGraph>(start = true, route = ROUTE_LIST)
 @Composable
-fun ListScreen(
+internal fun ListScreen(
     navigator: DestinationsNavigator,
     scaffoldState: ScaffoldState,
     viewModel: ListViewModel = koinViewModel(),

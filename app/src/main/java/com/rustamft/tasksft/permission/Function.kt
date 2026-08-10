@@ -8,13 +8,13 @@ import android.os.Build
 import androidx.core.content.ContextCompat
 import com.rustamft.tasksft.presentation.global.REQUEST_CODE_NOTIFICATION
 
-fun Context.isNotificationPermissionGranted(): Boolean {
+internal fun Context.isNotificationPermissionGranted(): Boolean {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
     val permissionStatus = ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
     return permissionStatus == PackageManager.PERMISSION_GRANTED
 }
 
-fun Activity.requestNotificationPermission() {
+internal fun Activity.requestNotificationPermission() {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
     requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_CODE_NOTIFICATION)
 }

@@ -21,7 +21,7 @@ import com.rustamft.tasksft.presentation.theme.AppTheme
 import org.koin.compose.koinInject
 
 @Composable
-fun MainActivityContent(
+internal fun MainActivityContent(
     context: Context = LocalContext.current,
     snackbarFlow: SnackbarFlow = koinInject(),
     scaffoldState: ScaffoldState = rememberScaffoldState(),

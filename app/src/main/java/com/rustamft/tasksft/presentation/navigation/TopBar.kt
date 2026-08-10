@@ -28,7 +28,7 @@ import com.rustamft.tasksft.presentation.theme.AppBarShape
 import com.rustamft.tasksft.presentation.theme.AppTheme
 
 @Composable
-fun TopBar(
+internal fun TopBar(
     title: String,
     backButton: (@Composable () -> Unit)? = null,
     leadingItem: NavItem? = null,

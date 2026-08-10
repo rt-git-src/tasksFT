@@ -25,7 +25,7 @@ import com.rustamft.tasksft.presentation.global.TASK_DESCRIPTION
 import com.rustamft.tasksft.presentation.global.TASK_ID
 import com.rustamft.tasksft.presentation.global.TASK_TITLE
 
-class OneTimeWorker(
+internal class OneTimeWorker(
     private val context: Context,
     workerParams: WorkerParameters,
 ) : Worker(context, workerParams) {

@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
-class SettingsViewModel(
+internal class SettingsViewModel(
     getPreferencesUseCase: GetPreferencesUseCase,
     private val savePreferencesUseCase: SavePreferencesUseCase,
     private val exportTasksUseCase: ExportTasksUseCase,

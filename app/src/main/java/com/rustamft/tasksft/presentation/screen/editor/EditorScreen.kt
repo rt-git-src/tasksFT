@@ -1,5 +1,6 @@
 package com.rustamft.tasksft.presentation.screen.editor
 
+import android.os.Bundle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -46,7 +47,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.annotation.parameters.DeepLink
@@ -84,12 +84,16 @@ import org.koin.core.parameter.parametersOf
     deepLinks = [DeepLink(uriPattern = "$DEEP_LINK_URI$FULL_ROUTE_PLACEHOLDER")],
 )
 @Composable
-fun EditorScreen(
+internal fun EditorScreen(
     navigator: DestinationsNavigator,
     scaffoldState: ScaffoldState,
     taskId: Int?,
     viewModel: EditorViewModel = koinViewModel(
-        parameters = { parametersOf(bundleOf(Pair(TASK_ID, taskId))) },
+        parameters = {
+            parametersOf(
+                taskId?.let { id -> Bundle().putInt(TASK_ID, id) },
+            )
+        },
     ),
 ) {
     LaunchedEffect(key1 = viewModel) {
@@ -99,7 +103,6 @@ fun EditorScreen(
             }
         }
     }
-
     EditorScreenContent(
         scaffoldState = scaffoldState,
         taskViewState = remember { mutableStateOf(viewModel.taskViewState) },
@@ -138,7 +141,6 @@ private fun EditorScreenContent(
     } else {
         R.style.DateTimePickerLightTheme
     }
-
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -205,7 +207,6 @@ private fun EditorScreenContent(
             uncheckedThumbColor = AppTheme.glass.contentMuted,
             uncheckedTrackColor = AppTheme.glass.control,
         )
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -254,7 +255,6 @@ private fun EditorScreenContent(
                 selected = true,
                 onClick = { openChooseColorDialogState.value = true },
             )
-
             Spacer(modifier = Modifier.height(20.dp))
             AppSurface(
                 modifier = Modifier.fillMaxWidth(),
@@ -289,9 +289,8 @@ private fun EditorScreenContent(
                             colors = switchColors,
                         )
                     }
-
                     if (task.isReminderSet) {
-                        GlassDivider()
+                        ReminderDivider()
                         ReminderControlRow(
                             iconResId = R.drawable.ic_event,
                             label = stringResource(id = R.string.reminder_date),
@@ -302,7 +301,7 @@ private fun EditorScreenContent(
                                 onValueChange = onValueChange,
                             )
                         }
-                        GlassDivider()
+                        ReminderDivider()
                         ReminderControlRow(
                             iconResId = R.drawable.ic_time,
                             label = stringResource(id = R.string.reminder_time),
@@ -313,7 +312,7 @@ private fun EditorScreenContent(
                                 onValueChange = onValueChange,
                             )
                         }
-                        GlassDivider()
+                        ReminderDivider()
                         ReminderControlRow(
                             iconResId = R.drawable.ic_repeat,
                             label = stringResource(id = R.string.reminder_repeat),
@@ -328,7 +327,6 @@ private fun EditorScreenContent(
                 }
             }
         }
-
         if (openTaskInfoDialogState.value) {
             AlertDialog(
                 onDismissRequest = { openTaskInfoDialogState.value = false },
@@ -358,7 +356,6 @@ private fun EditorScreenContent(
                 contentColor = AppTheme.glass.content,
             )
         }
-
         if (openChooseColorDialogState.value) {
             AlertDialog(
                 onDismissRequest = { openChooseColorDialogState.value = false },
@@ -389,7 +386,6 @@ private fun EditorScreenContent(
                 contentColor = AppTheme.glass.content,
             )
         }
-
         if (openUnsavedTaskDialogState.value) {
             AlertDialog(
                 onDismissRequest = { openUnsavedTaskDialogState.value = false },
@@ -451,7 +447,7 @@ private fun ReminderControlRow(
 }
 
 @Composable
-private fun GlassDivider() {
+private fun ReminderDivider() {
     Divider(
         modifier = Modifier.padding(start = 34.dp),
         color = AppTheme.glass.divider,
