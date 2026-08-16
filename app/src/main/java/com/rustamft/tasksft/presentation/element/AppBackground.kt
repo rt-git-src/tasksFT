@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -13,6 +14,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import com.rustamft.tasksft.R
 import com.rustamft.tasksft.presentation.theme.AppTheme
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.rememberHazeState
 
 @Composable
 internal fun AppBackground(
@@ -20,31 +23,40 @@ internal fun AppBackground(
     content: @Composable BoxScope.() -> Unit,
 ) {
     val glass = AppTheme.glass
+    val hazeState = rememberHazeState()
     Box(modifier = modifier.fillMaxSize()) {
-        Image(
-            modifier = Modifier.fillMaxSize(),
-            painter = painterResource(id = R.drawable.liquid_glass_background),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-        )
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(glass.backgroundOverlay),
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color.White.copy(alpha = if (AppTheme.isDark) 0.02f else 0.12f),
-                            Color.Transparent,
-                            glass.shadow.copy(alpha = if (AppTheme.isDark) 0.28f else 0.08f),
+                .hazeSource(state = hazeState),
+        ) {
+            Image(
+                modifier = Modifier.fillMaxSize(),
+                painter = painterResource(id = R.drawable.liquid_glass_background),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(glass.backgroundOverlay),
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.White.copy(alpha = if (AppTheme.isDark) 0.02f else 0.12f),
+                                Color.Transparent,
+                                glass.shadow.copy(alpha = if (AppTheme.isDark) 0.28f else 0.08f),
+                            ),
                         ),
                     ),
-                ),
-        )
-        content()
+            )
+        }
+        CompositionLocalProvider(LocalGlassHazeState provides hazeState) {
+            content()
+        }
     }
 }

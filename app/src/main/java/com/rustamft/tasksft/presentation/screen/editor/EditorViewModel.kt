@@ -34,7 +34,6 @@ internal class EditorViewModel(
     val successFlow = successChannel.receiveAsFlow()
     val taskViewState = TaskViewState()
     val openTaskInfoDialogState = mutableStateOf(false)
-    val openChooseColorDialogState = mutableStateOf(false)
     val openUnsavedTaskDialogState = mutableStateOf(false)
     val valueChangedState = mutableStateOf(false)
 

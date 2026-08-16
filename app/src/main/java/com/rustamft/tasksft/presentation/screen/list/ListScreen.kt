@@ -2,7 +2,6 @@ package com.rustamft.tasksft.presentation.screen.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -35,14 +35,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -64,6 +65,8 @@ import com.rustamft.tasksft.presentation.dialog.AppInfoDialog
 import com.rustamft.tasksft.presentation.element.AppBackground
 import com.rustamft.tasksft.presentation.element.AppSnackbarHost
 import com.rustamft.tasksft.presentation.element.AppSurface
+import com.rustamft.tasksft.presentation.element.appPressable
+import com.rustamft.tasksft.presentation.element.appToggleable
 import com.rustamft.tasksft.presentation.global.GITHUB_LINK
 import com.rustamft.tasksft.presentation.global.ROUTE_EDITOR
 import com.rustamft.tasksft.presentation.global.ROUTE_LIST
@@ -71,6 +74,7 @@ import com.rustamft.tasksft.presentation.global.ROUTE_SETTINGS
 import com.rustamft.tasksft.presentation.global.TAG_LIST_SCREEN
 import com.rustamft.tasksft.presentation.global.TAG_LIST_SCREEN_FAB
 import com.rustamft.tasksft.presentation.global.TAG_LIST_SCREEN_TASK_CARD
+import com.rustamft.tasksft.presentation.global.TAG_LIST_SCREEN_TASK_CHECKBOX
 import com.rustamft.tasksft.presentation.global.toDateTime
 import com.rustamft.tasksft.presentation.model.TaskViewState
 import com.rustamft.tasksft.presentation.navigation.Fab
@@ -100,9 +104,7 @@ internal fun ListScreen(
         onDeleteFinishedTasks = {
             viewModel.deleteTasks(tasks = listOfTasksState.value.filter { it.finished })
         },
-        onFinishTask = { task ->
-            viewModel.saveTask(task = task.copy(finished = !task.finished))
-        },
+        onFinishTask = viewModel::saveTask,
     )
 }
 
@@ -128,16 +130,19 @@ private fun ListScreenContent(
         topBar = {
             TopBar(
                 title = stringResource(id = R.string.screen_tasks),
-                leadingItem = NavItem(
-                    painterResId = R.drawable.ic_clean,
-                    descriptionResId = R.string.action_delete_finished,
-                    onClick = onDeleteFinishedTasks,
-                ),
+                leadingIconResId = R.drawable.ic_tasks,
                 items = listOf(
                     NavItem(
                         painterResId = R.drawable.ic_settings,
                         descriptionResId = R.string.action_settings,
                         onClick = onNavigateToSettings,
+                    ),
+                ),
+                overflowItems = listOf(
+                    NavItem(
+                        painterResId = R.drawable.ic_clean,
+                        descriptionResId = R.string.action_delete_finished,
+                        onClick = onDeleteFinishedTasks,
                     ),
                     NavItem(
                         painterResId = R.drawable.ic_info,
@@ -178,14 +183,16 @@ private fun ListScreenContent(
                 TaskCard(
                     task = task,
                     onOpen = { onNavigateToEditorExistingTask(task.id) },
-                    onFinish = { onFinishTask(task) },
+                    onFinishedChange = { finished ->
+                        onFinishTask(task.copy(finished = finished))
+                    },
                 )
             }
         }
         if (openAppInfoDialog.value) {
             AppInfoDialog(
-                onDismissClick = { openAppInfoDialog.value = false },
-                onOpenGithubClick = { uriHandler.openUri(GITHUB_LINK.toUri().toString()) },
+                onDismiss = { openAppInfoDialog.value = false },
+                onOpenGithub = { uriHandler.openUri(GITHUB_LINK.toUri().toString()) },
             )
         }
     }
@@ -195,7 +202,7 @@ private fun ListScreenContent(
 private fun TaskCard(
     task: Task,
     onOpen: () -> Unit,
-    onFinish: () -> Unit,
+    onFinishedChange: (Boolean) -> Unit,
 ) {
     val accent = when {
         task.finished -> AppTheme.glass.contentMuted
@@ -209,13 +216,9 @@ private fun TaskCard(
     AppSurface(
         modifier = Modifier
             .fillMaxWidth()
-            .pointerInput(task.id, task.finished) {
-                detectTapGestures(
-                    onTap = { onOpen() },
-                    onLongPress = { onFinish() },
-                )
-            }
+            .appPressable(onClick = onOpen, pressedScale = 0.99f)
             .testTag(TAG_LIST_SCREEN_TASK_CARD),
+        elevation = 8.dp,
     ) {
         Box(
             modifier = Modifier
@@ -228,6 +231,7 @@ private fun TaskCard(
                         ),
                     ),
                 )
+                .heightIn(min = 92.dp)
                 .padding(16.dp),
         ) {
             Row(
@@ -236,8 +240,18 @@ private fun TaskCard(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(44.dp)
-                        .semantics { contentDescription = finishedDescription }
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(11.dp))
+                        .appToggleable(
+                            value = task.finished,
+                            role = Role.Checkbox,
+                            onValueChange = onFinishedChange,
+                        )
+                        .semantics {
+                            contentDescription = finishedDescription
+                        }
+                        .testTag(TAG_LIST_SCREEN_TASK_CHECKBOX)
+                        .padding(4.dp)
                         .border(
                             width = 2.dp,
                             color = accent,
@@ -272,17 +286,8 @@ private fun TaskCard(
                         },
                         maxLines = 2,
                     )
-                    if (task.description.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = task.description,
-                            color = contentColor,
-                            style = MaterialTheme.typography.body2,
-                            maxLines = 2,
-                        )
-                    }
                     if (task.reminder != 0L) {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
                         TaskMetadata(task = task, accent = accent)
                     }
                 }
@@ -304,6 +309,7 @@ private fun TaskMetadata(
     accent: Color,
 ) {
     val dateTime = task.reminder.toDateTime()
+    val reminderText = task.reminder.reminderText(dateTime.date, dateTime.time)
     Row(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -315,7 +321,7 @@ private fun TaskMetadata(
             tint = accent,
         )
         Text(
-            text = "${dateTime.date} ${dateTime.time}",
+            text = reminderText,
             color = accent,
             style = MaterialTheme.typography.caption,
         )
@@ -336,6 +342,24 @@ private fun TaskMetadata(
             }
         }
     }
+}
+
+@Composable
+private fun Long.reminderText(date: String, time: String): String {
+    val target = Calendar.getInstance().apply { timeInMillis = this@reminderText }
+    val today = Calendar.getInstance()
+    val tomorrow = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 1) }
+    return when {
+        target.isSameDay(today) -> stringResource(id = R.string.reminder_today_at, time)
+        target.isSameDay(tomorrow) -> stringResource(id = R.string.reminder_tomorrow_at, time)
+        else -> "$date $time"
+    }
+}
+
+private fun Calendar.isSameDay(other: Calendar): Boolean {
+    return get(Calendar.ERA) == other.get(Calendar.ERA)
+            && get(Calendar.YEAR) == other.get(Calendar.YEAR)
+            && get(Calendar.DAY_OF_YEAR) == other.get(Calendar.DAY_OF_YEAR)
 }
 
 @Preview

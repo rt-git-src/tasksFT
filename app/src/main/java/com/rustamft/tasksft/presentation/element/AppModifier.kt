@@ -1,47 +1,142 @@
 package com.rustamft.tasksft.presentation.element
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.rustamft.tasksft.presentation.theme.AppCardShape
 import com.rustamft.tasksft.presentation.theme.AppControlShape
 import com.rustamft.tasksft.presentation.theme.AppTheme
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.HazeStyle
+import dev.chrisbanes.haze.HazeTint
+import dev.chrisbanes.haze.hazeEffect
+
+internal enum class GlassTone {
+    Regular,
+    Strong,
+    Control,
+}
+
+internal val LocalGlassHazeState = staticCompositionLocalOf<HazeState?> { null }
 
 @Composable
 internal fun Modifier.appTheme(
     shape: Shape = AppCardShape,
-    containerColor: Color = AppTheme.glass.surface,
-    elevation: Dp = 10.dp,
+    tone: GlassTone = GlassTone.Regular,
+    elevation: Dp = 8.dp,
 ): Modifier {
     val glass = AppTheme.glass
-    val topColor = containerColor.copy(
-        alpha = (containerColor.alpha + 0.10f).coerceAtMost(1f),
+    val hazeState = LocalGlassHazeState.current
+    val tint: Color
+    val fallbackTint: Color
+    val blurRadius: Dp
+    when (tone) {
+        GlassTone.Regular -> {
+            tint = glass.surface
+            fallbackTint = glass.surfaceFallback
+            blurRadius = 20.dp
+        }
+
+        GlassTone.Strong -> {
+            tint = glass.surfaceStrong
+            fallbackTint = glass.surfaceStrongFallback
+            blurRadius = 24.dp
+        }
+
+        GlassTone.Control -> {
+            tint = glass.control
+            fallbackTint = glass.controlFallback
+            blurRadius = 16.dp
+        }
+    }
+    val rimBrush = Brush.verticalGradient(
+        0f to glass.rimTop,
+        0.55f to glass.rimTop.copy(alpha = glass.rimTop.alpha * 0.35f),
+        1f to glass.rimBottom,
     )
-    return this
+    var result = this
         .shadow(
             elevation = elevation,
             shape = shape,
             clip = false,
+            ambientColor = glass.shadow,
+            spotColor = glass.shadow,
         )
         .clip(shape)
-        .background(
-            brush = Brush.verticalGradient(
-                colors = listOf(topColor, containerColor),
+    result = if (hazeState != null) {
+        result.hazeEffect(
+            state = hazeState,
+            style = HazeStyle(
+                backgroundColor = AppTheme.colors.background,
+                tint = HazeTint(tint),
+                blurRadius = blurRadius,
+                noiseFactor = 0.04f,
+                fallbackTint = HazeTint(fallbackTint),
             ),
         )
-        .border(
-            width = 1.dp,
-            color = glass.border,
-            shape = shape,
+    } else {
+        result.background(fallbackTint)
+    }
+    return result.drawWithCache {
+        val outline = shape.createOutline(size, layoutDirection, this)
+        val rimPath = Path().apply {
+            when (outline) {
+                is Outline.Rectangle -> addRect(outline.rect)
+                is Outline.Rounded -> addRoundRect(outline.roundRect)
+                is Outline.Generic -> addPath(outline.path)
+            }
+        }
+        val rimWidth = 1.dp.toPx()
+        val glintBrush = Brush.linearGradient(
+            colors = listOf(glass.highlight, Color.Transparent),
+            start = androidx.compose.ui.geometry.Offset.Zero,
+            end = androidx.compose.ui.geometry.Offset(size.width * 0.72f, size.height * 0.62f),
         )
+        val sheenBrush = Brush.radialGradient(
+            colors = listOf(
+                glass.highlight.copy(alpha = glass.highlight.alpha * 0.18f),
+                Color.Transparent,
+            ),
+            center = androidx.compose.ui.geometry.Offset(size.width * 0.18f, 0f),
+            radius = maxOf(size.width, size.height) * 0.9f,
+        )
+        onDrawWithContent {
+            drawPath(path = rimPath, brush = sheenBrush)
+            drawContent()
+            drawPath(
+                path = rimPath,
+                brush = rimBrush,
+                style = Stroke(width = rimWidth),
+            )
+            drawPath(
+                path = rimPath,
+                brush = glintBrush,
+                style = Stroke(width = rimWidth * 0.55f),
+            )
+        }
+    }
 }
 
 @Composable
@@ -49,6 +144,63 @@ internal fun Modifier.appThemeControl(
     shape: Shape = AppControlShape,
 ): Modifier = appTheme(
     shape = shape,
-    containerColor = AppTheme.glass.control,
+    tone = GlassTone.Control,
     elevation = 0.dp,
 )
+
+@Composable
+internal fun Modifier.appPressable(
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+    role: Role? = null,
+    pressedScale: Float = 0.97f,
+): Modifier {
+    val interactionSource = androidx.compose.runtime.remember { MutableInteractionSource() }
+    val pressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (pressed) pressedScale else 1f,
+        animationSpec = tween(durationMillis = 110),
+        label = "glassPressScale",
+    )
+    val indication = LocalIndication.current
+    return this
+        .graphicsLayer {
+            scaleX = scale
+            scaleY = scale
+        }
+        .clickable(
+            interactionSource = interactionSource,
+            indication = indication,
+            enabled = enabled,
+            role = role,
+            onClick = onClick,
+        )
+}
+
+@Composable
+internal fun Modifier.appToggleable(
+    value: Boolean,
+    onValueChange: (Boolean) -> Unit,
+    role: Role,
+    pressedScale: Float = 0.97f,
+): Modifier {
+    val interactionSource = androidx.compose.runtime.remember { MutableInteractionSource() }
+    val pressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (pressed) pressedScale else 1f,
+        animationSpec = tween(durationMillis = 110),
+        label = "glassToggleScale",
+    )
+    return this
+        .graphicsLayer {
+            scaleX = scale
+            scaleY = scale
+        }
+        .toggleable(
+            value = value,
+            interactionSource = interactionSource,
+            indication = LocalIndication.current,
+            role = role,
+            onValueChange = onValueChange,
+        )
+}

@@ -38,11 +38,15 @@ private val LightColorPalette = lightColors(
 )
 
 @Immutable
-data class LiquidGlassColors(
+data class GlassColors(
     val surface: Color,
     val surfaceStrong: Color,
     val control: Color,
-    val border: Color,
+    val surfaceFallback: Color,
+    val surfaceStrongFallback: Color,
+    val controlFallback: Color,
+    val rimTop: Color,
+    val rimBottom: Color,
     val highlight: Color,
     val shadow: Color,
     val divider: Color,
@@ -54,13 +58,17 @@ data class LiquidGlassColors(
     val dialogScrim: Color,
 )
 
-private val LightGlassPalette = LiquidGlassColors(
-    surface = Color(0xB8FFF9F7),
-    surfaceStrong = Color(0xE6FFF9F7),
-    control = Color(0x8CFFFFFF),
-    border = Color(0xB8FFFFFF),
-    highlight = Color(0xE6FFFFFF),
-    shadow = Color(0x3D5C2938),
+private val LightGlassPalette = GlassColors(
+    surface = Color(0x52FFF9F7),
+    surfaceStrong = Color(0x8AFFF9F7),
+    control = Color(0x38FFFFFF),
+    surfaceFallback = Color(0xD9FFF9F7),
+    surfaceStrongFallback = Color(0xF2FFF9F7),
+    controlFallback = Color(0xB8FFFFFF),
+    rimTop = Color(0xF2FFFFFF),
+    rimBottom = Color(0x4D9E6672),
+    highlight = Color(0x70FFFFFF),
+    shadow = Color(0x4D5C2938),
     divider = Color(0x267E2639),
     content = Ink,
     contentMuted = Color(0xFF6F6265),
@@ -70,13 +78,17 @@ private val LightGlassPalette = LiquidGlassColors(
     dialogScrim = Color(0x520F172A),
 )
 
-private val DarkGlassPalette = LiquidGlassColors(
-    surface = Color(0x8C172033),
-    surfaceStrong = Color(0xD91B2436),
-    control = Color(0x66323B4E),
-    border = Color(0x4DFFFFFF),
-    highlight = Color(0x66FFFFFF),
-    shadow = Color(0x99030A16),
+private val DarkGlassPalette = GlassColors(
+    surface = Color(0x4D172033),
+    surfaceStrong = Color(0x801B2436),
+    control = Color(0x33323B4E),
+    surfaceFallback = Color(0xD1192436),
+    surfaceStrongFallback = Color(0xF01B2436),
+    controlFallback = Color(0xB3323B4E),
+    rimTop = Color(0x73FFFFFF),
+    rimBottom = Color(0x52101626),
+    highlight = Color(0x38FFFFFF),
+    shadow = Color(0xB3030A16),
     divider = Color(0x38FFFFFF),
     content = Color(0xFFF8F4F5),
     contentMuted = Color(0xFFCBD0D9),
@@ -95,7 +107,7 @@ object AppTheme {
         @ReadOnlyComposable
         get() = MaterialTheme.colors
 
-    val glass: LiquidGlassColors
+    val glass: GlassColors
         @Composable
         @ReadOnlyComposable
         get() = LocalLiquidGlassColors.current

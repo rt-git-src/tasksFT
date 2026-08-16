@@ -6,19 +6,17 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.rustamft.tasksft.presentation.theme.AppTheme
 import com.rustamft.tasksft.presentation.theme.AppCardShape
 
 @Composable
-fun AppSurface(
+internal fun AppSurface(
     modifier: Modifier = Modifier,
     shape: Shape = AppCardShape,
-    containerColor: Color = AppTheme.glass.surface,
-    elevation: Dp = 10.dp,
+    tone: GlassTone = GlassTone.Regular,
+    elevation: Dp = 8.dp,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     content: @Composable BoxScope.() -> Unit,
 ) {
@@ -26,7 +24,7 @@ fun AppSurface(
         modifier = modifier
             .appTheme(
                 shape = shape,
-                containerColor = containerColor,
+                tone = tone,
                 elevation = elevation,
             )
             .padding(contentPadding),

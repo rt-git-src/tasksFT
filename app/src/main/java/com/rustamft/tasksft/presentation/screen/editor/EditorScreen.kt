@@ -13,9 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.Divider
 import androidx.compose.material.DrawerState
 import androidx.compose.material.DrawerValue
@@ -54,6 +54,8 @@ import com.ramcosta.composedestinations.annotation.parameters.FULL_ROUTE_PLACEHO
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.rustamft.tasksft.R
 import com.rustamft.tasksft.domain.model.Preferences
+import com.rustamft.tasksft.presentation.dialog.TaskInfoDialog
+import com.rustamft.tasksft.presentation.dialog.UnsavedTaskDialog
 import com.rustamft.tasksft.presentation.element.AppBackground
 import com.rustamft.tasksft.presentation.element.AppColorButton
 import com.rustamft.tasksft.presentation.element.AppDatePicker
@@ -61,20 +63,18 @@ import com.rustamft.tasksft.presentation.element.AppDropdownMenu
 import com.rustamft.tasksft.presentation.element.AppIconButton
 import com.rustamft.tasksft.presentation.element.AppSnackbarHost
 import com.rustamft.tasksft.presentation.element.AppSurface
-import com.rustamft.tasksft.presentation.element.AppTextButton
 import com.rustamft.tasksft.presentation.element.AppTimePicker
 import com.rustamft.tasksft.presentation.global.DEEP_LINK_URI
 import com.rustamft.tasksft.presentation.global.ROUTE_EDITOR
 import com.rustamft.tasksft.presentation.global.TAG_EDITOR_SCREEN
+import com.rustamft.tasksft.presentation.global.TAG_EDITOR_SCREEN_COLOR
 import com.rustamft.tasksft.presentation.global.TAG_EDITOR_SCREEN_EDITTEXT_TITLE
 import com.rustamft.tasksft.presentation.global.TAG_EDITOR_SCREEN_FAB
 import com.rustamft.tasksft.presentation.global.TASK_ID
-import com.rustamft.tasksft.presentation.global.toDateTime
 import com.rustamft.tasksft.presentation.model.TaskViewState
 import com.rustamft.tasksft.presentation.navigation.Fab
 import com.rustamft.tasksft.presentation.navigation.NavItem
 import com.rustamft.tasksft.presentation.navigation.TopBar
-import com.rustamft.tasksft.presentation.theme.AppCardShape
 import com.rustamft.tasksft.presentation.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -91,7 +91,9 @@ internal fun EditorScreen(
     viewModel: EditorViewModel = koinViewModel(
         parameters = {
             parametersOf(
-                taskId?.let { id -> Bundle().putInt(TASK_ID, id) },
+                Bundle().apply {
+                    taskId?.let { id -> putInt(TASK_ID, id) }
+                },
             )
         },
     ),
@@ -107,7 +109,6 @@ internal fun EditorScreen(
         scaffoldState = scaffoldState,
         taskViewState = remember { mutableStateOf(viewModel.taskViewState) },
         openTaskInfoDialogState = viewModel.openTaskInfoDialogState,
-        openChooseColorDialogState = viewModel.openChooseColorDialogState,
         openUnsavedTaskDialogState = viewModel.openUnsavedTaskDialogState,
         valueChangedState = viewModel.valueChangedState,
         onNavigateBack = { navigator.popBackStack() },
@@ -121,16 +122,15 @@ private fun EditorScreenContent(
     scaffoldState: ScaffoldState,
     taskViewState: State<TaskViewState>,
     openTaskInfoDialogState: MutableState<Boolean>,
-    openChooseColorDialogState: MutableState<Boolean>,
     openUnsavedTaskDialogState: MutableState<Boolean>,
     valueChangedState: MutableState<Boolean>,
     onNavigateBack: () -> Unit,
     onSaveTask: () -> Unit,
     onDeleteTask: () -> Unit,
 ) {
-    val task by taskViewState
+    val state by taskViewState
     val onValueChange = {
-        if (task.title.isBlank()) {
+        if (state.title.isBlank()) {
             valueChangedState.value = false
         } else if (!valueChangedState.value) {
             valueChangedState.value = true
@@ -219,9 +219,9 @@ private fun EditorScreenContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag(TAG_EDITOR_SCREEN_EDITTEXT_TITLE),
-                value = task.title,
+                value = state.title,
                 onValueChange = {
-                    task.title = it
+                    state.title = it
                     onValueChange()
                 },
                 label = { Text(text = stringResource(id = R.string.task_title)) },
@@ -231,9 +231,9 @@ private fun EditorScreenContent(
             )
             TextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = task.description,
+                value = state.description,
                 onValueChange = {
-                    task.description = it
+                    state.description = it
                     onValueChange()
                 },
                 label = { Text(text = stringResource(id = R.string.task_description)) },
@@ -250,11 +250,31 @@ private fun EditorScreenContent(
                 style = MaterialTheme.typography.caption,
             )
             Spacer(modifier = Modifier.height(8.dp))
-            AppColorButton(
-                color = task.color,
-                selected = true,
-                onClick = { openChooseColorDialogState.value = true },
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .selectableGroup(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                AppTheme.taskColors.forEachIndexed { index, color ->
+                    AppColorButton(
+                        modifier = Modifier.testTag("${TAG_EDITOR_SCREEN_COLOR}_$index"),
+                        color = color,
+                        selected = state.color == color,
+                        contentDescription = stringResource(
+                            id = R.string.task_color_option,
+                            index + 1,
+                        ),
+                        onClick = {
+                            if (state.color != color) {
+                                state.color = color
+                                onValueChange()
+                            }
+                        },
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(20.dp))
             AppSurface(
                 modifier = Modifier.fillMaxWidth(),
@@ -281,22 +301,22 @@ private fun EditorScreenContent(
                             style = MaterialTheme.typography.subtitle1,
                         )
                         Switch(
-                            checked = task.isReminderSet,
+                            checked = state.isReminderSet,
                             onCheckedChange = {
-                                task.isReminderSet = it
+                                state.isReminderSet = it
                                 onValueChange()
                             },
                             colors = switchColors,
                         )
                     }
-                    if (task.isReminderSet) {
+                    if (state.isReminderSet) {
                         ReminderDivider()
                         ReminderControlRow(
                             iconResId = R.drawable.ic_event,
                             label = stringResource(id = R.string.reminder_date),
                         ) {
                             AppDatePicker(
-                                calendarState = remember { mutableStateOf(task.reminder) },
+                                calendarState = remember { mutableStateOf(state.reminder) },
                                 themeResId = pickerDialogThemeResId,
                                 onValueChange = onValueChange,
                             )
@@ -307,7 +327,7 @@ private fun EditorScreenContent(
                             label = stringResource(id = R.string.reminder_time),
                         ) {
                             AppTimePicker(
-                                calendarState = remember { mutableStateOf(task.reminder) },
+                                calendarState = remember { mutableStateOf(state.reminder) },
                                 themeResId = pickerDialogThemeResId,
                                 onValueChange = onValueChange,
                             )
@@ -319,7 +339,7 @@ private fun EditorScreenContent(
                         ) {
                             AppDropdownMenu(
                                 itemToName = TaskViewState.CALENDAR_UNIT_TO_NAME,
-                                selectedItemState = task.stateRepeatCalendarUnits,
+                                selectedItemState = state.stateRepeatCalendarUnits,
                                 onClickAdditional = onValueChange,
                             )
                         }
@@ -328,90 +348,16 @@ private fun EditorScreenContent(
             }
         }
         if (openTaskInfoDialogState.value) {
-            AlertDialog(
-                onDismissRequest = { openTaskInfoDialogState.value = false },
-                title = { Text(text = stringResource(id = R.string.task_info)) },
-                text = {
-                    val createdString = if (task.created == 0L) {
-                        stringResource(id = R.string.now)
-                    } else {
-                        val dateTime = task.created.toDateTime()
-                        "${dateTime.date} ${dateTime.time}"
-                    }
-                    Text(
-                        text = stringResource(
-                            id = R.string.task_info_dialog_content,
-                            createdString,
-                        ),
-                    )
-                },
-                confirmButton = {
-                    AppTextButton(
-                        onClick = { openTaskInfoDialogState.value = false },
-                        text = stringResource(R.string.action_close),
-                    )
-                },
-                shape = AppCardShape,
-                backgroundColor = AppTheme.glass.surfaceStrong,
-                contentColor = AppTheme.glass.content,
-            )
-        }
-        if (openChooseColorDialogState.value) {
-            AlertDialog(
-                onDismissRequest = { openChooseColorDialogState.value = false },
-                title = { Text(text = stringResource(id = R.string.task_color)) },
-                text = {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        AppTheme.taskColors.forEach { color ->
-                            AppColorButton(
-                                color = color,
-                                selected = task.color == color,
-                                onClick = {
-                                    task.color = color
-                                    onValueChange()
-                                    openChooseColorDialogState.value = false
-                                },
-                            )
-                        }
-                    }
-                },
-                confirmButton = {},
-                dismissButton = {},
-                shape = AppCardShape,
-                backgroundColor = AppTheme.glass.surfaceStrong,
-                contentColor = AppTheme.glass.content,
+            TaskInfoDialog(
+                createTime = state.created,
+                onDismissClick = { openTaskInfoDialogState.value = false },
             )
         }
         if (openUnsavedTaskDialogState.value) {
-            AlertDialog(
-                onDismissRequest = { openUnsavedTaskDialogState.value = false },
-                title = { Text(text = stringResource(id = R.string.task_unsaved)) },
-                text = { Text(text = stringResource(id = R.string.task_unsaved_dialog_content)) },
-                confirmButton = {
-                    AppTextButton(
-                        onClick = {
-                            openUnsavedTaskDialogState.value = false
-                            onSaveTask()
-                        },
-                        text = stringResource(R.string.action_save),
-                    )
-                },
-                dismissButton = {
-                    AppTextButton(
-                        onClick = {
-                            openUnsavedTaskDialogState.value = false
-                            onNavigateBack()
-                        },
-                        text = stringResource(R.string.action_discard),
-                    )
-                },
-                shape = AppCardShape,
-                backgroundColor = AppTheme.glass.surfaceStrong,
-                contentColor = AppTheme.glass.content,
+            UnsavedTaskDialog(
+                onDismiss = { openUnsavedTaskDialogState.value = false },
+                onSaveTask = onSaveTask,
+                onNavigateBack = onNavigateBack,
             )
         }
     }
@@ -475,7 +421,6 @@ private fun EditorScreenPreviewContent(
                     )
                 },
                 openTaskInfoDialogState = remember { mutableStateOf(false) },
-                openChooseColorDialogState = remember { mutableStateOf(false) },
                 openUnsavedTaskDialogState = remember { mutableStateOf(false) },
                 valueChangedState = remember { mutableStateOf(true) },
                 onNavigateBack = {},
@@ -485,7 +430,6 @@ private fun EditorScreenPreviewContent(
         }
     }
 }
-
 
 private class EditorScreenPreviewParameter : PreviewParameterProvider<Preferences.Theme> {
     override val values = sequenceOf(

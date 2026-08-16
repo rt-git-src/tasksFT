@@ -12,6 +12,7 @@
     <string name="action_new_task">Новая задача</string>
     <string name="action_export_tasks">Экспортировать задачи</string>
     <string name="action_import_tasks">Импортировать задачи</string>
+    <string name="action_more">Другие действия</string>
 
     <string name="app_info">Информация о приложении</string>
     <string name="app_info_dialog_content">\n
@@ -47,8 +48,11 @@
     <string name="reminder_repeat">Повторить</string>
     <string name="reminder_date">Дата</string>
     <string name="reminder_time">Время</string>
+    <string name="reminder_today_at">Сегодня %1$s</string>
+    <string name="reminder_tomorrow_at">Завтра %1$s</string>
 
     <string name="task_color">Цвет задачи</string>
+    <string name="task_color_option">Цвет задачи %1$d</string>
     <string name="task_description">Описание</string>
     <string name="task_finished_state">Состояние завершенности задачи</string>
     <string name="task_info">Информация о задаче</string>

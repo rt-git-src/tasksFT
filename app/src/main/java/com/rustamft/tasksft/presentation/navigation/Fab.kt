@@ -4,10 +4,10 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -32,6 +33,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.rustamft.tasksft.R
 import com.rustamft.tasksft.domain.model.Preferences
+import com.rustamft.tasksft.presentation.element.GlassTone
+import com.rustamft.tasksft.presentation.element.appPressable
 import com.rustamft.tasksft.presentation.element.appTheme
 import com.rustamft.tasksft.presentation.theme.AppTheme
 
@@ -53,16 +56,29 @@ internal fun Fab(
         ) {
             Box(
                 modifier = modifier
-                    .defaultMinSize(minWidth = 196.dp, minHeight = 64.dp)
-                    .appTheme(shape = CircleShape)
-                    .clickable(onClick = item.onClick)
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                    .width(248.dp)
+                    .height(68.dp)
+                    .appPressable(onClick = item.onClick)
+                    .appTheme(
+                        shape = CircleShape,
+                        tone = GlassTone.Strong,
+                        elevation = 12.dp,
+                    )
+                    .padding(horizontal = 10.dp, vertical = 9.dp),
             ) {
                 Box(
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(50.dp)
                         .clip(CircleShape)
-                        .background(AppTheme.colors.primaryVariant),
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(
+                                    AppTheme.glass.accent.copy(alpha = 0.86f),
+                                    AppTheme.colors.primaryVariant,
+                                ),
+                            ),
+                        )
+                        .border(1.dp, AppTheme.glass.rimTop, CircleShape),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -74,7 +90,7 @@ internal fun Fab(
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(horizontal = 54.dp, vertical = 15.dp),
                     text = stringResource(item.descriptionResId),
                     textAlign = TextAlign.Center,
                     color = AppTheme.glass.accent,

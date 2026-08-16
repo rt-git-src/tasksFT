@@ -5,21 +5,27 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
@@ -46,6 +52,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -61,12 +70,16 @@ import com.rustamft.tasksft.presentation.element.AppBackground
 import com.rustamft.tasksft.presentation.element.AppIconButton
 import com.rustamft.tasksft.presentation.element.AppSnackbarHost
 import com.rustamft.tasksft.presentation.element.AppSurface
+import com.rustamft.tasksft.presentation.element.appPressable
 import com.rustamft.tasksft.presentation.element.appThemeControl
 import com.rustamft.tasksft.presentation.global.ROUTE_SETTINGS
 import com.rustamft.tasksft.presentation.global.TAG_SETTINGS_EXPORT
 import com.rustamft.tasksft.presentation.global.TAG_SETTINGS_RESTORE
 import com.rustamft.tasksft.presentation.global.TAG_SETTINGS_SCREEN
 import com.rustamft.tasksft.presentation.global.TAG_SETTINGS_THEME_CONTROL
+import com.rustamft.tasksft.presentation.global.TAG_SETTINGS_THEME_DARK
+import com.rustamft.tasksft.presentation.global.TAG_SETTINGS_THEME_LIGHT
+import com.rustamft.tasksft.presentation.global.TAG_SETTINGS_THEME_SYSTEM
 import com.rustamft.tasksft.presentation.navigation.TopBar
 import com.rustamft.tasksft.presentation.theme.AppControlShape
 import com.rustamft.tasksft.presentation.theme.AppTheme
@@ -132,11 +145,6 @@ private fun SettingsScreenContent(
     onExportTasks: (Uri) -> Unit,
 ) {
     val preferences by preferencesState
-    val nextTheme = when (preferences.theme) {
-        is Preferences.Theme.Auto -> Preferences.Theme.Light
-        is Preferences.Theme.Light -> Preferences.Theme.Dark
-        is Preferences.Theme.Dark -> Preferences.Theme.Auto
-    }
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -174,14 +182,14 @@ private fun SettingsScreenContent(
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     SectionTitle(
-                        iconResId = themeIcon(preferences.theme),
+                        iconResId = R.drawable.ic_appearance,
                         title = stringResource(id = R.string.appearance),
                     )
                     Spacer(modifier = Modifier.size(16.dp))
                     ThemeCycleControl(
                         modifier = Modifier.testTag(TAG_SETTINGS_THEME_CONTROL),
                         selectedTheme = preferences.theme,
-                        onClick = { onSetTheme(nextTheme) },
+                        onThemeSelected = onSetTheme,
                     )
                 }
             }
@@ -191,13 +199,13 @@ private fun SettingsScreenContent(
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     SectionTitle(
-                        iconResId = R.drawable.ic_save,
+                        iconResId = R.drawable.ic_backup,
                         title = stringResource(id = R.string.backup),
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     SettingsActionRow(
                         modifier = Modifier.testTag(TAG_SETTINGS_EXPORT),
-                        iconResId = R.drawable.ic_save,
+                        iconResId = R.drawable.ic_export,
                         label = stringResource(id = R.string.action_export_tasks),
                         onClick = {
                             if (preferences.backupDirectory.isEmpty()) {
@@ -213,7 +221,7 @@ private fun SettingsScreenContent(
                     )
                     SettingsActionRow(
                         modifier = Modifier.testTag(TAG_SETTINGS_RESTORE),
-                        iconResId = R.drawable.ic_restore,
+                        iconResId = R.drawable.ic_import,
                         label = stringResource(id = R.string.action_import_tasks),
                         onClick = onChooseFile,
                     )
@@ -224,9 +232,9 @@ private fun SettingsScreenContent(
     if (openExportConfirmDialogState.value) {
         ExportConfirmDialog(
             backupDirectory = preferences.backupDirectory,
-            onDismissClick = { openExportConfirmDialogState.value = false },
-            onChooseDirectoryClick = onChooseDirectory,
-            onExportTasksClick = { onExportTasks(preferences.backupDirectory.toUri()) },
+            onDismiss = { openExportConfirmDialogState.value = false },
+            onChooseDirectory = onChooseDirectory,
+            onExportTasks = { onExportTasks(preferences.backupDirectory.toUri()) },
         )
     }
 }
@@ -256,41 +264,80 @@ private fun SectionTitle(
 private fun ThemeCycleControl(
     modifier: Modifier = Modifier,
     selectedTheme: Preferences.Theme,
-    onClick: () -> Unit,
+    onThemeSelected: (Preferences.Theme) -> Unit,
 ) {
     val options = listOf(
-        Preferences.Theme.Auto to stringResource(id = R.string.theme_auto_short),
-        Preferences.Theme.Light to stringResource(id = R.string.theme_light_short),
-        Preferences.Theme.Dark to stringResource(id = R.string.theme_dark_short),
+        Triple(
+            Preferences.Theme.Auto,
+            stringResource(id = R.string.theme_auto_short),
+            TAG_SETTINGS_THEME_SYSTEM,
+        ),
+        Triple(
+            Preferences.Theme.Light,
+            stringResource(id = R.string.theme_light_short),
+            TAG_SETTINGS_THEME_LIGHT,
+        ),
+        Triple(
+            Preferences.Theme.Dark,
+            stringResource(id = R.string.theme_dark_short),
+            TAG_SETTINGS_THEME_DARK,
+        ),
     )
-
-    Row(
+    val selectedIndex = options.indexOfFirst { (theme, _, _) -> selectedTheme == theme }
+        .coerceAtLeast(0)
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
             .appThemeControl(shape = AppControlShape)
             .clip(AppControlShape)
-            .clickable(onClick = onClick)
+            .height(52.dp)
             .padding(3.dp),
-        horizontalArrangement = Arrangement.spacedBy(2.dp),
     ) {
-        options.forEach { (theme, label) ->
-            val selected = selectedTheme::class == theme::class
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(11.dp))
-                    .background(
-                        if (selected) AppTheme.glass.accent else Color.Transparent,
+        val segmentWidth = (maxWidth - 6.dp) / options.size
+        val selectorOffset by animateDpAsState(
+            targetValue = segmentWidth * selectedIndex,
+            animationSpec = tween(durationMillis = 220),
+            label = "themeSelectorOffset",
+        )
+        Box(
+            modifier = Modifier
+                .offset(x = selectorOffset)
+                .width(segmentWidth)
+                .height(46.dp)
+                .clip(RoundedCornerShape(11.dp))
+                .background(AppTheme.glass.accent),
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .selectableGroup(),
+        ) {
+            options.forEach { (theme, label, tag) ->
+                val selected = selectedTheme == theme
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(11.dp))
+                        .appPressable(
+                            onClick = {
+                                if (!selected) {
+                                    onThemeSelected(theme)
+                                }
+                            },
+                            role = Role.RadioButton,
+                        )
+                        .semantics { this.selected = selected }
+                        .testTag(tag),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = label,
+                        color = if (selected) Color.White else AppTheme.glass.content,
+                        style = MaterialTheme.typography.button,
+                        maxLines = 1,
                     )
-                    .padding(horizontal = 6.dp, vertical = 11.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = label,
-                    color = if (selected) Color.White else AppTheme.glass.content,
-                    style = MaterialTheme.typography.button,
-                    maxLines = 1,
-                )
+                }
             }
         }
     }
@@ -307,7 +354,7 @@ private fun SettingsActionRow(
         modifier = modifier
             .fillMaxWidth()
             .clip(AppControlShape)
-            .clickable(onClick = onClick)
+            .appPressable(onClick = onClick, pressedScale = 0.99f)
             .padding(vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -331,12 +378,6 @@ private fun SettingsActionRow(
             tint = AppTheme.glass.contentMuted,
         )
     }
-}
-
-private fun themeIcon(theme: Preferences.Theme): Int = when (theme) {
-    is Preferences.Theme.Auto -> R.drawable.ic_theme_auto
-    is Preferences.Theme.Light -> R.drawable.ic_theme_light
-    is Preferences.Theme.Dark -> R.drawable.ic_theme_dark
 }
 
 @Preview

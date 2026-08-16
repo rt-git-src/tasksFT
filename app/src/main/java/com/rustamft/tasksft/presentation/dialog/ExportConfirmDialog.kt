@@ -1,7 +1,5 @@
 package com.rustamft.tasksft.presentation.dialog
 
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -9,43 +7,23 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.rustamft.tasksft.R
 import com.rustamft.tasksft.domain.model.Preferences
-import com.rustamft.tasksft.presentation.element.AppTextButton
-import com.rustamft.tasksft.presentation.theme.AppCardShape
 import com.rustamft.tasksft.presentation.theme.AppTheme
 
 @Composable
 internal fun ExportConfirmDialog(
     backupDirectory: String,
-    onDismissClick: () -> Unit,
-    onChooseDirectoryClick: () -> Unit,
-    onExportTasksClick: () -> Unit,
+    onDismiss: () -> Unit,
+    onChooseDirectory: () -> Unit,
+    onExportTasks: () -> Unit,
 ) {
-    AlertDialog(
-        onDismissRequest = onDismissClick,
-        title = { Text(text = stringResource(id = R.string.backup)) },
-        text = {
-            Text(
-                text = stringResource(
-                    id = R.string.backup_dialog_content,
-                    backupDirectory,
-                ),
-            )
-        },
-        confirmButton = {
-            AppTextButton(
-                onClick = onChooseDirectoryClick,
-                text = stringResource(id = R.string.backup_dialog_choose_dir),
-            )
-        },
-        dismissButton = {
-            AppTextButton(
-                onClick = onExportTasksClick,
-                text = stringResource(R.string.action_save),
-            )
-        },
-        shape = AppCardShape,
-        backgroundColor = AppTheme.glass.surfaceStrong,
-        contentColor = AppTheme.glass.content,
+    AppDialog(
+        title = stringResource(id = R.string.backup),
+        text = stringResource(R.string.backup_dialog_content, backupDirectory),
+        primaryText = stringResource(R.string.action_save),
+        secondaryText = stringResource(id = R.string.backup_dialog_choose_dir),
+        onDismiss = onDismiss,
+        onPrimaryClick = onExportTasks,
+        onSecondaryClick = onChooseDirectory,
     )
 }
 
@@ -57,9 +35,9 @@ private fun ExportConfirmDialogPreview(
     AppTheme(theme = theme) {
         ExportConfirmDialog(
             backupDirectory = "",
-            onDismissClick = {},
-            onChooseDirectoryClick = {},
-            onExportTasksClick = {},
+            onDismiss = {},
+            onChooseDirectory = {},
+            onExportTasks = {},
         )
     }
 }

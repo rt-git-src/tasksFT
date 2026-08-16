@@ -8,6 +8,12 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+ktlint {
+    filter {
+        exclude { source -> source.file.invariantSeparatorsPath.contains("/generated/") }
+    }
+}
+
 kotlin {
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
@@ -79,6 +85,7 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.uiToolingPreview)
     implementation(libs.compose.material)
+    implementation(libs.haze)
     androidTestImplementation(libs.compose.uiTestJunit4)
     debugImplementation(libs.compose.debugUiTooling)
     debugImplementation(libs.compose.debugUiTestManifest)

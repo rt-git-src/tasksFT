@@ -12,6 +12,7 @@
     <string name="action_new_task">New task</string>
     <string name="action_export_tasks">Export tasks</string>
     <string name="action_import_tasks">Import tasks</string>
+    <string name="action_more">More options</string>
 
     <string name="app_info">App info</string>
     <string name="app_info_dialog_content">\n
@@ -47,8 +48,11 @@
     <string name="reminder_repeat">Repeat</string>
     <string name="reminder_date">Date</string>
     <string name="reminder_time">Time</string>
+    <string name="reminder_today_at">Today %1$s</string>
+    <string name="reminder_tomorrow_at">Tomorrow %1$s</string>
 
     <string name="task_color">Task color</string>
+    <string name="task_color_option">Task color %1$d</string>
     <string name="task_description">Description</string>
     <string name="task_finished_state">Task finished state</string>
     <string name="task_info">Task info</string>

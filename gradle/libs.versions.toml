@@ -12,6 +12,7 @@ junit5 = "6.1.2"
 kaspresso = "1.6.1"
 ktlint = "14.2.0"
 drawerlayout = "1.2.0"
+haze = "1.7.2"
 
 [libraries]
 core-ktx = { module = "androidx.core:core-ktx", version = "1.18.0" }
@@ -27,6 +28,7 @@ compose-uiTestJunit4 = { module = "androidx.compose.ui:ui-test-junit4", version.
 compose-debugUiTooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-debugUiTestManifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose" }
 accompanist = { module = "com.google.accompanist:accompanist-systemuicontroller", version = "0.36.0" }
+haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 composeDestinations-core = { module = "io.github.raamcosta.compose-destinations:core", version.ref = "composeDestinations" }
 composeDestinations-ksp = { module = "io.github.raamcosta.compose-destinations:ksp", version.ref = "composeDestinations" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }

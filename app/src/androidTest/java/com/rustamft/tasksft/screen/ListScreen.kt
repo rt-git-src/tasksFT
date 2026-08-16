@@ -6,6 +6,7 @@ import com.rustamft.tasksft.R
 import com.rustamft.tasksft.presentation.global.TAG_LIST_SCREEN
 import com.rustamft.tasksft.presentation.global.TAG_LIST_SCREEN_FAB
 import com.rustamft.tasksft.presentation.global.TAG_LIST_SCREEN_TASK_CARD
+import com.rustamft.tasksft.presentation.global.TAG_LIST_SCREEN_TASK_CHECKBOX
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.github.kakaocup.compose.node.element.KNode
 
@@ -27,5 +28,8 @@ class ListScreen(
     }
     val taskCard = child<KNode> {
         hasTestTag(TAG_LIST_SCREEN_TASK_CARD)
+    }
+    val taskCheckbox = child<KNode> {
+        hasTestTag(TAG_LIST_SCREEN_TASK_CHECKBOX)
     }
 }
