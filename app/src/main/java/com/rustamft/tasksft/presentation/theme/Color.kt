@@ -14,9 +14,20 @@ val Ink = Color(0xFF211A1C)
 val MistBlue = Color(0xFFCBD5E0)
 val NightBlue = Color(0xFF111827)
 
-// Task card colors (30% opaque)
-val PureCrimson = Color(0x4DC3272B)
-val Corn = Color(0x4DFAA945)
-val Patina = Color(0x4D407A52)
-val LapisLazuli = Color(0x4D1F4788)
-val WisteriaPurple = Color(0x4D875F9A)
+internal val LightTaskPalette = listOf(
+    Color(0xFF9F2942),
+    Color(0xFF795300),
+    Color(0xFF286342),
+    Color(0xFF285B9F),
+    Color(0xFF6D477B),
+)
+
+internal val DarkTaskPalette = listOf(
+    Color(0xFFF29AAF),
+    Color(0xFFF0C66C),
+    Color(0xFF79D39C),
+    Color(0xFF91B9FF),
+    Color(0xFFD2A7EA),
+)
+
+internal val TaskColorIndices = LightTaskPalette.indices

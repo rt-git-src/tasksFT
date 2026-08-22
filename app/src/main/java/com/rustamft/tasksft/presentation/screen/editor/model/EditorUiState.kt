@@ -12,6 +12,6 @@ internal data class EditorUiState(
     val reminderEpochMillis: Long,
     val reminderRepeat: ReminderRepeat,
     val finished: Boolean,
-    val color: Int,
+    val colorIndex: Int,
     val saveEnabled: Boolean,
 )

@@ -129,13 +129,14 @@ object AppTheme {
         @ReadOnlyComposable
         get() = LocalIsDarkTheme.current
 
-    val taskColors = listOf(
-        PureCrimson,
-        Corn,
-        Patina,
-        LapisLazuli,
-        WisteriaPurple,
-    )
+    val taskColors: List<Color>
+        @Composable
+        @ReadOnlyComposable
+        get() = if (isDark) DarkTaskPalette else LightTaskPalette
+
+    @Composable
+    @ReadOnlyComposable
+    fun taskColor(index: Int): Color = taskColors.getOrElse(index) { taskColors.first() }
 }
 
 @Composable

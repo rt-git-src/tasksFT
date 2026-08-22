@@ -38,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -207,8 +206,14 @@ private fun TaskCard(
     onOpen: () -> Unit,
     onFinishedChange: (Boolean) -> Unit,
 ) {
-    val accent = if (task.finished) AppTheme.glass.contentMuted else Color(task.color)
-    val contentColor = if (task.finished) AppTheme.glass.contentMuted else AppTheme.glass.content
+    val accent = when {
+        task.finished -> AppTheme.glass.contentMuted
+        else -> AppTheme.taskColor(task.colorIndex)
+    }
+    val contentColor = when {
+        task.finished -> AppTheme.glass.contentMuted
+        else -> AppTheme.glass.content
+    }
     val finishedDescription = stringResource(R.string.task_finished_state)
     AppSurface(
         modifier = Modifier
@@ -363,21 +368,20 @@ private fun ListScreenPreview(
         AppBackground {
             ListScreenContent(
                 uiState = ListUiState(
-                    tasks = listOf("Prepare release", "Buy groceries", "Call Mom", "Book hotel")
-                        .mapIndexed { index, title ->
-                            Task(
-                                id = index,
-                                created = 0L,
-                                title = title,
-                                description = "",
-                                reminder = Calendar.getInstance().apply {
-                                    add(Calendar.DAY_OF_MONTH, index)
-                                }.timeInMillis,
-                                repeatCalendarUnit = if (index == 3) Calendar.WEEK_OF_MONTH else 0,
-                                finished = index == 3,
-                                color = AppTheme.taskColors[index].toArgb(),
-                            )
-                        },
+                    tasks = listOf("Prepare release", "Buy groceries", "Call Mom", "Book hotel").mapIndexed { index, title ->
+                        Task(
+                            id = index,
+                            created = 0L,
+                            title = title,
+                            description = "",
+                            reminder = Calendar.getInstance().apply {
+                                add(Calendar.DAY_OF_MONTH, index)
+                            }.timeInMillis,
+                            repeatCalendarUnit = if (index == 3) Calendar.WEEK_OF_MONTH else 0,
+                            finished = index == 3,
+                            colorIndex = index,
+                        )
+                    },
                 ),
                 snackbarHostState = SnackbarHostState(),
                 onOpenSettings = {},

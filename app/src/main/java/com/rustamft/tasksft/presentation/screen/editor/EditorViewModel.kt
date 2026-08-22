@@ -1,6 +1,5 @@
 package com.rustamft.tasksft.presentation.screen.editor
 
-import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rustamft.tasksft.R
@@ -15,7 +14,7 @@ import com.rustamft.tasksft.presentation.screen.editor.model.EditorEffect
 import com.rustamft.tasksft.presentation.screen.editor.model.EditorUiState
 import com.rustamft.tasksft.presentation.screen.editor.model.ReminderRepeat
 import com.rustamft.tasksft.presentation.screen.editor.model.defaultReminderEpochMillis
-import com.rustamft.tasksft.presentation.theme.PureCrimson
+import com.rustamft.tasksft.presentation.theme.TaskColorIndices
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,7 +44,7 @@ internal class EditorViewModel(
             reminderEpochMillis = defaultReminderEpochMillis(),
             reminderRepeat = ReminderRepeat.NONE,
             finished = false,
-            color = PureCrimson.toArgb(),
+            colorIndex = TaskColorIndices.random(),
             saveEnabled = false,
         )
     )
@@ -70,8 +69,8 @@ internal class EditorViewModel(
         updateState { copy(description = description) }
     }
 
-    fun onColorChange(color: Int) {
-        updateState { copy(color = color) }
+    fun onColorChange(colorIndex: Int) {
+        updateState { copy(colorIndex = colorIndex) }
     }
 
     fun onReminderEnabledChange(enabled: Boolean) {
@@ -124,7 +123,7 @@ internal class EditorViewModel(
             reminderEpochMillis = task.reminder.takeIf { it > 0L } ?: defaultReminderEpochMillis(),
             reminderRepeat = ReminderRepeat.fromCalendarUnit(task.repeatCalendarUnit),
             finished = task.finished,
-            color = task.color,
+            colorIndex = task.colorIndex,
             saveEnabled = false,
         )
     }
@@ -146,7 +145,7 @@ internal class EditorViewModel(
             reminder = reminderEpochMillis.takeIf { reminderEnabled } ?: 0L,
             repeatCalendarUnit = reminderRepeat.calendarUnit.takeIf { reminderEnabled } ?: 0,
             finished = finished,
-            color = color,
+            colorIndex = colorIndex,
         )
     }
 }

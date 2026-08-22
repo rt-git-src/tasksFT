@@ -40,7 +40,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -279,9 +278,9 @@ internal fun EditorScreenContent(
                     AppColorButton(
                         modifier = Modifier.testTag("${TAG_EDITOR_SCREEN_COLOR}_$index"),
                         color = color,
-                        selected = uiState.color == color.toArgb(),
+                        selected = uiState.colorIndex == index,
                         contentDescription = stringResource(R.string.task_color_option, index + 1),
-                        onClick = { onColorChange(color.toArgb()) },
+                        onClick = { onColorChange(index) },
                     )
                 }
             }
@@ -443,7 +442,7 @@ private fun EditorScreenPreview(
                     reminderEpochMillis = defaultReminderEpochMillis(),
                     reminderRepeat = ReminderRepeat.DAILY,
                     finished = false,
-                    color = AppTheme.taskColors.first().toArgb(),
+                    colorIndex = AppTheme.taskColors.indices.first,
                     saveEnabled = true,
                 ),
                 snackbarHostState = SnackbarHostState(),

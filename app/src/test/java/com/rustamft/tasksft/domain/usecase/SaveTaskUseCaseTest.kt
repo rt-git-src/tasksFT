@@ -44,7 +44,7 @@ internal class SaveTaskUseCaseTest {
                     reminder = 1L,
                     repeatCalendarUnit = 0,
                     finished = false,
-                    color = 0x00000000
+                    colorIndex = 0,
                 ),
                 shouldSchedule = true
             )
@@ -57,7 +57,7 @@ internal class SaveTaskUseCaseTest {
                     reminder = -1L,
                     repeatCalendarUnit = 0,
                     finished = false,
-                    color = 0x00000000
+                    colorIndex = 0,
                 ),
                 shouldSchedule = false
             )
@@ -70,7 +70,7 @@ internal class SaveTaskUseCaseTest {
                     reminder = 1L,
                     repeatCalendarUnit = 0,
                     finished = true,
-                    color = 0x00000000
+                    colorIndex = 0,
                 ),
                 shouldSchedule = false
             )
