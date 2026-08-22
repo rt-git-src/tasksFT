@@ -30,7 +30,8 @@ internal val appModule = module {
             getAllTasksUseCase = get(),
             saveTaskUseCase = get(),
             deleteTasksUseCase = get(),
-            exceptionHandler = get()
+            snackbarFlow = get(),
+            exceptionHandler = get(),
         )
     }
 
@@ -41,7 +42,7 @@ internal val appModule = module {
             saveTaskUseCase = get(),
             deleteTaskUseCase = get(),
             snackbarFlow = get(),
-            exceptionHandler = get()
+            exceptionHandler = get(),
         )
     }
 
@@ -52,7 +53,7 @@ internal val appModule = module {
             exportTasksUseCase = get(),
             importTasksUseCase = get(),
             snackbarFlow = get(),
-            exceptionHandler = get()
+            exceptionHandler = get(),
         )
     }
 }

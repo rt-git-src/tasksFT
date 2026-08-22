@@ -2,10 +2,13 @@ package com.rustamft.tasksft.presentation.screen.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rustamft.tasksft.R
 import com.rustamft.tasksft.domain.model.Task
 import com.rustamft.tasksft.domain.usecase.DeleteTaskUseCase
 import com.rustamft.tasksft.domain.usecase.GetAllTasksUseCase
 import com.rustamft.tasksft.domain.usecase.SaveTaskUseCase
+import com.rustamft.tasksft.presentation.global.SnackbarFlow
+import com.rustamft.tasksft.presentation.model.UIText
 import com.rustamft.tasksft.presentation.screen.list.model.ListUiState
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,6 +21,7 @@ internal class ListViewModel(
     getAllTasksUseCase: GetAllTasksUseCase,
     private val saveTaskUseCase: SaveTaskUseCase,
     private val deleteTasksUseCase: DeleteTaskUseCase,
+    private val snackbarFlow: SnackbarFlow,
     private val exceptionHandler: CoroutineExceptionHandler,
 ) : ViewModel() {
 
@@ -43,6 +47,7 @@ internal class ListViewModel(
             ?.let { tasks ->
                 viewModelScope.launch(exceptionHandler) {
                     deleteTasksUseCase.execute(tasks)
+                    snackbarFlow.emit(UIText.StringResource(R.string.task_removed_finished))
                 }
             }
     }

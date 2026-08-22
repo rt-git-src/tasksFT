@@ -64,6 +64,7 @@
     <string name="task_unsaved_dialog_content">\n
         What would you like to do?
     </string>
+    <string name="task_removed_finished">Finished tasks has been removed</string>
 
     <string name="theme">Theme</string>
     <string name="theme_auto">System theme</string>
