@@ -4,10 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.rustamft.tasksft.BuildConfig
 import com.rustamft.tasksft.R
 import com.rustamft.tasksft.domain.model.Preferences
+import com.rustamft.tasksft.presentation.preview.ThemePreviewProvider
 import com.rustamft.tasksft.presentation.theme.AppTheme
 
 @Composable
@@ -16,9 +16,9 @@ internal fun AppInfoDialog(
     onOpenGithub: () -> Unit,
 ) {
     AppDialog(
-        title = stringResource(id = R.string.app_info),
+        title = stringResource(R.string.app_info),
         text = "${
-            stringResource(id = R.string.app_info_dialog_content)
+            stringResource(R.string.app_info_dialog_content)
         } ${
             BuildConfig.VERSION_NAME
         }",
@@ -33,7 +33,7 @@ internal fun AppInfoDialog(
 @Preview
 @Composable
 private fun AppInfoDialogPreview(
-    @PreviewParameter(AppInfoDialogPreviewParameter::class) theme: Preferences.Theme,
+    @PreviewParameter(ThemePreviewProvider::class) theme: Preferences.Theme,
 ) {
     AppTheme(theme = theme) {
         AppInfoDialog(
@@ -41,11 +41,4 @@ private fun AppInfoDialogPreview(
             onOpenGithub = {},
         )
     }
-}
-
-private class AppInfoDialogPreviewParameter : PreviewParameterProvider<Preferences.Theme> {
-    override val values = sequenceOf(
-        Preferences.Theme.Light,
-        Preferences.Theme.Dark,
-    )
 }

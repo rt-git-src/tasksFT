@@ -1,8 +1,5 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("kotlin-kapt")
-    id("kotlin-parcelize")
     alias(libs.plugins.ktlint)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.compose)
@@ -11,20 +8,6 @@ plugins {
 ktlint {
     filter {
         exclude { source -> source.file.invariantSeparatorsPath.contains("/generated/") }
-    }
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-    }
-    sourceSets {
-        debug {
-            kotlin.srcDir("build/generated/ksp/debug/kotlin")
-        }
-        release {
-            kotlin.srcDir("build/generated/ksp/release/kotlin")
-        }
     }
 }
 
@@ -55,6 +38,14 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+    sourceSets {
+        named("debug") {
+            kotlin.directories += "build/generated/ksp/debug/kotlin"
+        }
+        named("release") {
+            kotlin.directories += "build/generated/ksp/release/kotlin"
+        }
+    }
     buildFeatures {
         buildConfig = true
         compose = true
@@ -78,19 +69,18 @@ dependencies {
     implementation(libs.lifecycle.runtimeKtx)
     implementation(libs.lifecycle.service)
     implementation(libs.lifecycle.viewmodelCompose)
+    implementation(libs.lifecycle.runtimeCompose)
     // Activity
     implementation(libs.activity.compose)
     implementation(libs.drawerlayout)
     // Compose
     implementation(libs.compose.ui)
     implementation(libs.compose.uiToolingPreview)
-    implementation(libs.compose.material)
+    implementation(libs.compose.material3)
     implementation(libs.haze)
     androidTestImplementation(libs.compose.uiTestJunit4)
     debugImplementation(libs.compose.debugUiTooling)
     debugImplementation(libs.compose.debugUiTestManifest)
-    // Accompanist
-    implementation(libs.accompanist)
     // Compose destinations
     implementation(libs.composeDestinations.core)
     ksp(libs.composeDestinations.ksp)
@@ -108,6 +98,7 @@ dependencies {
     // JUnit
     testImplementation(libs.junit.api)
     testRuntimeOnly(libs.junit.engine)
+    testImplementation(libs.junit4)
     androidTestImplementation(libs.junit.android)
     // MockK
     testImplementation(libs.mockk)

@@ -1,5 +1,6 @@
 package com.rustamft.tasksft.presentation.global
 
+import androidx.compose.ui.Modifier
 import com.rustamft.tasksft.presentation.model.DateTime
 import com.rustamft.tasksft.presentation.model.TimeDifference
 import java.util.Calendar
@@ -43,5 +44,13 @@ internal fun Long.toTimeDifference(): TimeDifference {
             hours,
             minutes
         )
+    }
+}
+
+internal inline fun Modifier.thenIf(condition: Boolean, modifier: Modifier.() -> Modifier): Modifier {
+    return if (condition) {
+        then(modifier(Modifier))
+    } else {
+        this
     }
 }

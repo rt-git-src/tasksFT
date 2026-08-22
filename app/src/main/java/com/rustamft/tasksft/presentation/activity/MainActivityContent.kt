@@ -1,13 +1,13 @@
 package com.rustamft.tasksft.presentation.activity
 
 import android.content.Context
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ramcosta.composedestinations.DestinationsNavHost
@@ -24,17 +24,17 @@ import org.koin.compose.koinInject
 internal fun MainActivityContent(
     context: Context = LocalContext.current,
     snackbarFlow: SnackbarFlow = koinInject(),
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     navController: NavHostController = rememberNavController(),
     getPreferencesUseCase: GetPreferencesUseCase = koinInject(),
 ) {
-    val preferences by getPreferencesUseCase.execute().collectAsState(initial = Preferences())
+    val preferences by getPreferencesUseCase
+        .execute()
+        .collectAsStateWithLifecycle(initialValue = Preferences())
 
-    LaunchedEffect(true) {
+    LaunchedEffect(snackbarFlow, snackbarHostState) {
         snackbarFlow.collect { uiText ->
-            scaffoldState.snackbarHostState.showSnackbar(
-                message = uiText.asString(context),
-            )
+            snackbarHostState.showSnackbar(message = uiText.asString(context))
         }
     }
 
@@ -44,7 +44,7 @@ internal fun MainActivityContent(
                 navGraph = NavGraphs.root,
                 navController = navController,
                 dependenciesContainerBuilder = {
-                    dependency(scaffoldState)
+                    dependency(snackbarHostState)
                 },
             )
         }

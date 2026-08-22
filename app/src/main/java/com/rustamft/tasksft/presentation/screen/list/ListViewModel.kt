@@ -1,14 +1,17 @@
 package com.rustamft.tasksft.presentation.screen.list
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rustamft.tasksft.domain.model.Task
 import com.rustamft.tasksft.domain.usecase.DeleteTaskUseCase
 import com.rustamft.tasksft.domain.usecase.GetAllTasksUseCase
 import com.rustamft.tasksft.domain.usecase.SaveTaskUseCase
+import com.rustamft.tasksft.presentation.screen.list.model.ListUiState
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 internal class ListViewModel(
@@ -18,18 +21,29 @@ internal class ListViewModel(
     private val exceptionHandler: CoroutineExceptionHandler,
 ) : ViewModel() {
 
-    val listOfTasksFlow = getAllTasksUseCase.execute()
-    val openAppInfoDialogState = mutableStateOf(false)
+    val uiState: StateFlow<ListUiState> = getAllTasksUseCase
+        .execute()
+        .map(::ListUiState)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = ListUiState(),
+        )
 
-    fun saveTask(task: Task) {
-        launchInViewModelScope { saveTaskUseCase.execute(task = task) }
+    fun setTaskFinished(task: Task, finished: Boolean) {
+        viewModelScope.launch(exceptionHandler) {
+            saveTaskUseCase.execute(task.copy(finished = finished))
+        }
     }
 
-    fun deleteTasks(tasks: List<Task>) {
-        launchInViewModelScope { deleteTasksUseCase.execute(tasks = tasks) }
-    }
-
-    private fun launchInViewModelScope(block: suspend CoroutineScope.() -> Unit) {
-        viewModelScope.launch(exceptionHandler) { block() }
+    fun deleteFinishedTasks() {
+        uiState.value.tasks
+            .filter(Task::finished)
+            .takeIf { it.isNotEmpty() }
+            ?.let { tasks ->
+                viewModelScope.launch(exceptionHandler) {
+                    deleteTasksUseCase.execute(tasks)
+                }
+            }
     }
 }

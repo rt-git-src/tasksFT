@@ -1,6 +1,5 @@
 package com.rustamft.tasksft.di
 
-import android.os.Bundle
 import android.util.Log
 import com.rustamft.tasksft.presentation.global.SnackbarFlow
 import com.rustamft.tasksft.presentation.global.TAG_COROUTINE_EXCEPTION
@@ -35,9 +34,9 @@ internal val appModule = module {
         )
     }
 
-    viewModel<EditorViewModel> { (bundle: Bundle) ->
+    viewModel<EditorViewModel> { parameters ->
         EditorViewModel(
-            arguments = bundle,
+            taskId = parameters.getOrNull<Int>(),
             getTaskUseCase = get(),
             saveTaskUseCase = get(),
             deleteTaskUseCase = get(),

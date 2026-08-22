@@ -1,40 +1,52 @@
 package com.rustamft.tasksft.presentation.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.Colors
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.rustamft.tasksft.domain.model.Preferences.Theme
 
-private val DarkColorPalette = darkColors(
+private val DarkColorPalette = darkColorScheme(
     primary = RedWisteria,
-    primaryVariant = DeepBurgundy,
+    onPrimary = NightBlue,
+    primaryContainer = DeepBurgundy,
+    onPrimaryContainer = White,
     secondary = MistBlue,
-    secondaryVariant = White,
+    onSecondary = NightBlue,
+    secondaryContainer = DarkBlue,
+    onSecondaryContainer = White,
     background = NightBlue,
     onBackground = White,
     surface = DarkBlue,
     onSurface = IndigoWhite,
+    surfaceVariant = Color(0xFF323B4E),
+    onSurfaceVariant = MistBlue,
+    outline = Color(0xFF8D94A3),
 )
 
-private val LightColorPalette = lightColors(
+private val LightColorPalette = lightColorScheme(
     primary = DeepBurgundy,
-    primaryVariant = Sappanwood,
+    onPrimary = White,
+    primaryContainer = Sappanwood,
+    onPrimaryContainer = White,
     secondary = IndigoWhite,
-    secondaryVariant = White,
     onSecondary = Ink,
+    secondaryContainer = Color(0xFFFFE8EE),
+    onSecondaryContainer = Ink,
     background = WarmIvory,
     onBackground = Ink,
     surface = White,
     onSurface = Ink,
+    surfaceVariant = Color(0xFFF5E8EB),
+    onSurfaceVariant = Color(0xFF6F6265),
+    outline = Color(0xFF887176),
 )
 
 @Immutable
@@ -102,10 +114,10 @@ private val LocalLiquidGlassColors = staticCompositionLocalOf { LightGlassPalett
 private val LocalIsDarkTheme = staticCompositionLocalOf { false }
 
 object AppTheme {
-    val colors: Colors
+    val colors: ColorScheme
         @Composable
         @ReadOnlyComposable
-        get() = MaterialTheme.colors
+        get() = MaterialTheme.colorScheme
 
     val glass: GlassColors
         @Composable
@@ -138,17 +150,12 @@ fun AppTheme(
     }
     val colors = if (isDark) DarkColorPalette else LightColorPalette
     val glassColors = if (isDark) DarkGlassPalette else LightGlassPalette
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setSystemBarsColor(
-        color = Color.Transparent,
-        darkIcons = !isDark,
-    )
     CompositionLocalProvider(
         LocalLiquidGlassColors provides glassColors,
         LocalIsDarkTheme provides isDark,
     ) {
         MaterialTheme(
-            colors = colors,
+            colorScheme = colors,
             typography = Typography,
             shapes = Shapes,
             content = content,

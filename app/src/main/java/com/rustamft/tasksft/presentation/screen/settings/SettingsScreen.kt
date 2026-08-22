@@ -2,49 +2,40 @@ package com.rustamft.tasksft.presentation.screen.settings
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
-import androidx.compose.material.DrawerState
-import androidx.compose.material.DrawerValue
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,14 +43,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.selected
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -67,11 +54,8 @@ import com.rustamft.tasksft.R
 import com.rustamft.tasksft.domain.model.Preferences
 import com.rustamft.tasksft.presentation.dialog.ExportConfirmDialog
 import com.rustamft.tasksft.presentation.element.AppBackground
-import com.rustamft.tasksft.presentation.element.AppIconButton
 import com.rustamft.tasksft.presentation.element.AppSnackbarHost
 import com.rustamft.tasksft.presentation.element.AppSurface
-import com.rustamft.tasksft.presentation.element.appPressable
-import com.rustamft.tasksft.presentation.element.appThemeControl
 import com.rustamft.tasksft.presentation.global.ROUTE_SETTINGS
 import com.rustamft.tasksft.presentation.global.TAG_SETTINGS_EXPORT
 import com.rustamft.tasksft.presentation.global.TAG_SETTINGS_RESTORE
@@ -80,99 +64,113 @@ import com.rustamft.tasksft.presentation.global.TAG_SETTINGS_THEME_CONTROL
 import com.rustamft.tasksft.presentation.global.TAG_SETTINGS_THEME_DARK
 import com.rustamft.tasksft.presentation.global.TAG_SETTINGS_THEME_LIGHT
 import com.rustamft.tasksft.presentation.global.TAG_SETTINGS_THEME_SYSTEM
+import com.rustamft.tasksft.presentation.navigation.NavItem
 import com.rustamft.tasksft.presentation.navigation.TopBar
+import com.rustamft.tasksft.presentation.preview.ThemePreviewProvider
+import com.rustamft.tasksft.presentation.screen.settings.model.SettingsEffect
+import com.rustamft.tasksft.presentation.screen.settings.model.SettingsUiState
 import com.rustamft.tasksft.presentation.theme.AppControlShape
 import com.rustamft.tasksft.presentation.theme.AppTheme
+import com.rustamft.tasksft.presentation.theme.Shapes
+import com.rustamft.tasksft.presentation.theme.appPressable
 import org.koin.androidx.compose.koinViewModel
 
 @Destination<RootGraph>(route = ROUTE_SETTINGS)
 @Composable
 internal fun SettingsScreen(
     navigator: DestinationsNavigator,
-    scaffoldState: ScaffoldState,
+    snackbarHostState: SnackbarHostState,
     viewModel: SettingsViewModel = koinViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var showExportConfirmation by rememberSaveable { mutableStateOf(false) }
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            result.data?.data?.let { uri -> viewModel.exportTasks(directoryUri = uri) }
+            result.data?.data?.toString()?.let(viewModel::exportTasks)
         }
     }
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            result.data?.data?.let { uri -> viewModel.importTasks(fileUri = uri) }
+            result.data?.data?.toString()?.let(viewModel::importTasks)
         }
     }
-    LaunchedEffect(key1 = viewModel) {
-        viewModel.successFlow.collect { success ->
-            if (success) {
-                navigator.popBackStack()
+    LaunchedEffect(viewModel, navigator) {
+        viewModel.effects.collect { effect ->
+            when (effect) {
+                SettingsEffect.NavigateBack -> navigator.popBackStack()
             }
         }
+    }
+    val chooseDirectory = {
+        exportLauncher.launch(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE))
     }
     SettingsScreenContent(
-        scaffoldState = scaffoldState,
-        preferencesState = viewModel.preferencesFlow.collectAsState(initial = Preferences()),
-        openExportConfirmDialogState = viewModel.openExportConfirmDialogState,
+        uiState = uiState,
+        snackbarHostState = snackbarHostState,
         onNavigateBack = { navigator.popBackStack() },
-        onSetTheme = { theme -> viewModel.setTheme(theme) },
-        onChooseDirectory = {
-            exportLauncher.launch(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE))
-        },
+        onThemeSelected = viewModel::setTheme,
+        onChooseDirectory = chooseDirectory,
         onChooseFile = {
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = "application/*"
-            }
-            importLauncher.launch(intent)
+            importLauncher.launch(
+                Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "application/*"
+                },
+            )
         },
-        onExportTasks = { uri -> viewModel.exportTasks(uri) },
+        onShowExportConfirmation = { showExportConfirmation = true },
     )
+    if (showExportConfirmation) {
+        ExportConfirmDialog(
+            backupDirectory = uiState.preferences.backupDirectory,
+            onDismiss = { showExportConfirmation = false },
+            onChooseDirectory = chooseDirectory,
+            onExportTasks = {
+                viewModel.exportTasks(uiState.preferences.backupDirectory)
+            },
+        )
+    }
 }
 
 @Composable
-private fun SettingsScreenContent(
-    scaffoldState: ScaffoldState,
-    preferencesState: State<Preferences>,
-    openExportConfirmDialogState: MutableState<Boolean>,
+internal fun SettingsScreenContent(
+    uiState: SettingsUiState,
+    snackbarHostState: SnackbarHostState,
     onNavigateBack: () -> Unit,
-    onSetTheme: (Preferences.Theme) -> Unit,
+    onThemeSelected: (Preferences.Theme) -> Unit,
     onChooseDirectory: () -> Unit,
     onChooseFile: () -> Unit,
-    onExportTasks: (Uri) -> Unit,
+    onShowExportConfirmation: () -> Unit,
 ) {
-    val preferences by preferencesState
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .testTag(TAG_SETTINGS_SCREEN),
-        scaffoldState = scaffoldState,
-        snackbarHost = { AppSnackbarHost(hostState = it) },
-        backgroundColor = Color.Transparent,
+        containerColor = Color.Transparent,
+        contentWindowInsets = WindowInsets.safeDrawing.only(
+            WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom,
+        ),
+        snackbarHost = { AppSnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopBar(
-                title = stringResource(id = R.string.action_settings),
-                items = emptyList(),
-                backButton = {
-                    AppIconButton(
-                        painter = painterResource(id = R.drawable.ic_arrow_back),
-                        contentDescription = stringResource(id = R.string.action_back),
-                        tint = AppTheme.glass.content,
-                        onClick = onNavigateBack,
-                    )
-                },
+                title = stringResource(R.string.action_settings),
+                leadingItem = NavItem(
+                    painterResId = R.drawable.ic_arrow_back,
+                    descriptionResId = R.string.action_back,
+                    onClick = onNavigateBack,
+                ),
             )
         },
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding())
+                .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .navigationBarsPadding()
                 .padding(horizontal = 16.dp, vertical = 18.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp),
         ) {
@@ -183,13 +181,13 @@ private fun SettingsScreenContent(
                 Column(modifier = Modifier.fillMaxWidth()) {
                     SectionTitle(
                         iconResId = R.drawable.ic_appearance,
-                        title = stringResource(id = R.string.appearance),
+                        title = stringResource(R.string.appearance),
                     )
                     Spacer(modifier = Modifier.size(16.dp))
-                    ThemeCycleControl(
+                    ThemeSelector(
                         modifier = Modifier.testTag(TAG_SETTINGS_THEME_CONTROL),
-                        selectedTheme = preferences.theme,
-                        onThemeSelected = onSetTheme,
+                        selectedTheme = uiState.preferences.theme,
+                        onThemeSelected = onThemeSelected,
                     )
                 }
             }
@@ -200,54 +198,43 @@ private fun SettingsScreenContent(
                 Column(modifier = Modifier.fillMaxWidth()) {
                     SectionTitle(
                         iconResId = R.drawable.ic_backup,
-                        title = stringResource(id = R.string.backup),
+                        title = stringResource(R.string.backup),
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     SettingsActionRow(
                         modifier = Modifier.testTag(TAG_SETTINGS_EXPORT),
                         iconResId = R.drawable.ic_export,
-                        label = stringResource(id = R.string.action_export_tasks),
+                        label = stringResource(R.string.action_export_tasks),
                         onClick = {
-                            if (preferences.backupDirectory.isEmpty()) {
+                            if (uiState.preferences.backupDirectory.isEmpty()) {
                                 onChooseDirectory()
                             } else {
-                                openExportConfirmDialogState.value = true
+                                onShowExportConfirmation()
                             }
                         },
                     )
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier.padding(start = 40.dp),
                         color = AppTheme.glass.divider,
                     )
                     SettingsActionRow(
                         modifier = Modifier.testTag(TAG_SETTINGS_RESTORE),
                         iconResId = R.drawable.ic_import,
-                        label = stringResource(id = R.string.action_import_tasks),
+                        label = stringResource(R.string.action_import_tasks),
                         onClick = onChooseFile,
                     )
                 }
             }
         }
     }
-    if (openExportConfirmDialogState.value) {
-        ExportConfirmDialog(
-            backupDirectory = preferences.backupDirectory,
-            onDismiss = { openExportConfirmDialogState.value = false },
-            onChooseDirectory = onChooseDirectory,
-            onExportTasks = { onExportTasks(preferences.backupDirectory.toUri()) },
-        )
-    }
 }
 
 @Composable
-private fun SectionTitle(
-    iconResId: Int,
-    title: String,
-) {
+private fun SectionTitle(iconResId: Int, title: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
             modifier = Modifier.size(24.dp),
-            painter = painterResource(id = iconResId),
+            painter = painterResource(iconResId),
             contentDescription = null,
             tint = AppTheme.glass.accent,
         )
@@ -255,89 +242,50 @@ private fun SectionTitle(
         Text(
             text = title,
             color = AppTheme.glass.content,
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.titleMedium,
         )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ThemeCycleControl(
+private fun ThemeSelector(
     modifier: Modifier = Modifier,
     selectedTheme: Preferences.Theme,
     onThemeSelected: (Preferences.Theme) -> Unit,
 ) {
     val options = listOf(
-        Triple(
-            Preferences.Theme.Auto,
-            stringResource(id = R.string.theme_auto_short),
-            TAG_SETTINGS_THEME_SYSTEM,
-        ),
-        Triple(
-            Preferences.Theme.Light,
-            stringResource(id = R.string.theme_light_short),
-            TAG_SETTINGS_THEME_LIGHT,
-        ),
-        Triple(
-            Preferences.Theme.Dark,
-            stringResource(id = R.string.theme_dark_short),
-            TAG_SETTINGS_THEME_DARK,
-        ),
+        Triple(Preferences.Theme.Auto, stringResource(R.string.theme_auto_short), TAG_SETTINGS_THEME_SYSTEM),
+        Triple(Preferences.Theme.Light, stringResource(R.string.theme_light_short), TAG_SETTINGS_THEME_LIGHT),
+        Triple(Preferences.Theme.Dark, stringResource(R.string.theme_dark_short), TAG_SETTINGS_THEME_DARK),
     )
-    val selectedIndex = options.indexOfFirst { (theme, _, _) -> selectedTheme == theme }
-        .coerceAtLeast(0)
-    BoxWithConstraints(
+    SingleChoiceSegmentedButtonRow(
         modifier = modifier
             .fillMaxWidth()
-            .appThemeControl(shape = AppControlShape)
-            .clip(AppControlShape)
-            .height(52.dp)
-            .padding(3.dp),
+            .padding(horizontal = 4.dp),
     ) {
-        val segmentWidth = (maxWidth - 6.dp) / options.size
-        val selectorOffset by animateDpAsState(
-            targetValue = segmentWidth * selectedIndex,
-            animationSpec = tween(durationMillis = 220),
-            label = "themeSelectorOffset",
-        )
-        Box(
-            modifier = Modifier
-                .offset(x = selectorOffset)
-                .width(segmentWidth)
-                .height(46.dp)
-                .clip(RoundedCornerShape(11.dp))
-                .background(AppTheme.glass.accent),
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .selectableGroup(),
-        ) {
-            options.forEach { (theme, label, tag) ->
-                val selected = selectedTheme == theme
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .clip(RoundedCornerShape(11.dp))
-                        .appPressable(
-                            onClick = {
-                                if (!selected) {
-                                    onThemeSelected(theme)
-                                }
-                            },
-                            role = Role.RadioButton,
-                        )
-                        .semantics { this.selected = selected }
-                        .testTag(tag),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = label,
-                        color = if (selected) Color.White else AppTheme.glass.content,
-                        style = MaterialTheme.typography.button,
-                        maxLines = 1,
-                    )
-                }
+        options.forEachIndexed { index, (theme, label, tag) ->
+            val selected = selectedTheme == theme
+            SegmentedButton(
+                modifier = Modifier.testTag(tag),
+                selected = selected,
+                onClick = { if (!selected) onThemeSelected(theme) },
+                shape = SegmentedButtonDefaults.itemShape(index, options.size, Shapes.small),
+                colors = SegmentedButtonDefaults.colors(
+                    activeContainerColor = AppTheme.glass.accent,
+                    activeContentColor = Color.White,
+                    activeBorderColor = AppTheme.glass.rimTop,
+                    inactiveContainerColor = Color.Transparent,
+                    inactiveContentColor = AppTheme.glass.content,
+                    inactiveBorderColor = AppTheme.glass.divider,
+                ),
+                icon = {},
+            ) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelLarge,
+                    maxLines = 1,
+                )
             }
         }
     }
@@ -345,10 +293,10 @@ private fun ThemeCycleControl(
 
 @Composable
 private fun SettingsActionRow(
-    modifier: Modifier = Modifier,
     iconResId: Int,
     label: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
@@ -360,7 +308,7 @@ private fun SettingsActionRow(
     ) {
         Icon(
             modifier = Modifier.size(22.dp),
-            painter = painterResource(id = iconResId),
+            painter = painterResource(iconResId),
             contentDescription = null,
             tint = AppTheme.glass.contentMuted,
         )
@@ -369,11 +317,11 @@ private fun SettingsActionRow(
             modifier = Modifier.weight(1f),
             text = label,
             color = AppTheme.glass.content,
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
         )
         Icon(
             modifier = Modifier.size(22.dp),
-            painter = painterResource(id = R.drawable.ic_chevron_right),
+            painter = painterResource(R.drawable.ic_chevron_right),
             contentDescription = null,
             tint = AppTheme.glass.contentMuted,
         )
@@ -383,27 +331,19 @@ private fun SettingsActionRow(
 @Preview
 @Composable
 private fun SettingsScreenPreview(
-    @PreviewParameter(SettingsScreenPreviewParameter::class) theme: Preferences.Theme,
+    @PreviewParameter(ThemePreviewProvider::class) theme: Preferences.Theme,
 ) {
     AppTheme(theme = theme) {
         AppBackground {
             SettingsScreenContent(
-                scaffoldState = ScaffoldState(DrawerState(DrawerValue.Open), SnackbarHostState()),
-                preferencesState = remember { mutableStateOf(Preferences()) },
-                openExportConfirmDialogState = remember { mutableStateOf(false) },
+                uiState = SettingsUiState(Preferences(theme = theme)),
+                snackbarHostState = SnackbarHostState(),
                 onNavigateBack = {},
-                onSetTheme = {},
+                onThemeSelected = {},
                 onChooseDirectory = {},
                 onChooseFile = {},
-                onExportTasks = {},
+                onShowExportConfirmation = {},
             )
         }
     }
-}
-
-private class SettingsScreenPreviewParameter : PreviewParameterProvider<Preferences.Theme> {
-    override val values = sequenceOf(
-        Preferences.Theme.Light,
-        Preferences.Theme.Dark,
-    )
 }

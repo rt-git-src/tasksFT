@@ -14,6 +14,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import com.rustamft.tasksft.R
 import com.rustamft.tasksft.presentation.theme.AppTheme
+import com.rustamft.tasksft.presentation.theme.LocalGlassHazeState
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 
@@ -32,7 +33,7 @@ internal fun AppBackground(
         ) {
             Image(
                 modifier = Modifier.fillMaxSize(),
-                painter = painterResource(id = R.drawable.liquid_glass_background),
+                painter = painterResource(R.drawable.liquid_glass_background),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
             )

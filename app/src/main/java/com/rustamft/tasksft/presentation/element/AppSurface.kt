@@ -10,6 +10,8 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.rustamft.tasksft.presentation.theme.AppCardShape
+import com.rustamft.tasksft.presentation.theme.GlassTone
+import com.rustamft.tasksft.presentation.theme.glassSurface
 
 @Composable
 internal fun AppSurface(
@@ -22,7 +24,7 @@ internal fun AppSurface(
 ) {
     Box(
         modifier = modifier
-            .appTheme(
+            .glassSurface(
                 shape = shape,
                 tone = tone,
                 elevation = elevation,

@@ -11,11 +11,11 @@ internal fun TaskInfoDialog(
     onDismissClick: () -> Unit,
 ) {
     AppDialog(
-        title = stringResource(id = R.string.task_info),
+        title = stringResource(R.string.task_info),
         text = stringResource(
             R.string.task_info_dialog_content,
             if (createTime == 0L) {
-                stringResource(id = R.string.now)
+                stringResource(R.string.now)
             } else {
                 val dateTime = createTime.toDateTime()
                 "${dateTime.date} ${dateTime.time}"

@@ -2,44 +2,29 @@ package com.rustamft.tasksft.presentation.element
 
 import android.app.TimePickerDialog
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.rustamft.tasksft.presentation.global.format
 import java.util.Calendar
 
 @Composable
-fun AppTimePicker(
-    modifier: Modifier = Modifier,
-    calendarState: State<Calendar>,
+internal fun AppTimePicker(
+    value: Long,
+    onValueChange: (Long) -> Unit,
     themeResId: Int,
-    onValueChange: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    val calendar by calendarState
-
-    fun getStringFromCalendar(): String {
-        return "${
-            calendar.get(Calendar.HOUR_OF_DAY).format(2)
-        }:${
-            calendar.get(Calendar.MINUTE).format(2)
-        }"
-    }
-
-    var text by remember(calendar.timeInMillis) { mutableStateOf(getStringFromCalendar()) }
-    val timePickerDialog = TimePickerDialog(
+    val calendar = Calendar.getInstance().apply { timeInMillis = value }
+    val dialog = TimePickerDialog(
         LocalContext.current,
         themeResId,
-        { _, hour: Int, minute: Int ->
-            calendar.apply {
+        { _, hour, minute ->
+            val updated = Calendar.getInstance().apply {
+                timeInMillis = value
                 set(Calendar.HOUR_OF_DAY, hour)
                 set(Calendar.MINUTE, minute)
             }
-            text = getStringFromCalendar()
-            onValueChange()
+            onValueChange(updated.timeInMillis)
         },
         calendar.get(Calendar.HOUR_OF_DAY),
         calendar.get(Calendar.MINUTE),
@@ -47,7 +32,9 @@ fun AppTimePicker(
     )
     AppValueControl(
         modifier = modifier,
-        text = text,
-        onClick = timePickerDialog::show,
+        text = "${calendar.get(Calendar.HOUR_OF_DAY).format(2)}:${
+            calendar.get(Calendar.MINUTE).format(2)
+        }",
+        onClick = dialog::show,
     )
 }

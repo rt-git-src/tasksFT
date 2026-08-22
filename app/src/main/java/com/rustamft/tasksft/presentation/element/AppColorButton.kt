@@ -16,10 +16,11 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.rustamft.tasksft.domain.model.Preferences
+import com.rustamft.tasksft.presentation.preview.ThemePreviewProvider
 import com.rustamft.tasksft.presentation.theme.AppTheme
+import com.rustamft.tasksft.presentation.theme.appPressable
 
 @Composable
 internal fun AppColorButton(
@@ -65,21 +66,14 @@ internal fun AppColorButton(
 @Preview
 @Composable
 private fun AppColorButtonPreview(
-    @PreviewParameter(AppColorButtonPreviewParameter::class) themeAndColor: Pair<Color, Preferences.Theme>,
+    @PreviewParameter(ThemePreviewProvider::class) theme: Preferences.Theme,
 ) {
-    val (color, theme) = themeAndColor
     AppTheme(theme = theme) {
         AppColorButton(
-            color = color,
+            color = AppTheme.taskColors.first(),
             selected = true,
             contentDescription = "",
             onClick = {},
         )
     }
-}
-
-private class AppColorButtonPreviewParameter : PreviewParameterProvider<Pair<Color, Preferences.Theme>> {
-    override val values = AppTheme.taskColors.associateWith { Preferences.Theme.Light }.toList()
-        .plus(AppTheme.taskColors.associateWith { Preferences.Theme.Dark }.toList())
-        .asSequence()
 }

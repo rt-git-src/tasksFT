@@ -8,23 +8,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.rustamft.tasksft.domain.model.Preferences
 import com.rustamft.tasksft.presentation.element.AppSurface
 import com.rustamft.tasksft.presentation.element.AppTextButton
-import com.rustamft.tasksft.presentation.element.GlassTone
-import com.rustamft.tasksft.presentation.element.LocalGlassHazeState
+import com.rustamft.tasksft.presentation.preview.ThemePreviewProvider
 import com.rustamft.tasksft.presentation.theme.AppTheme
+import com.rustamft.tasksft.presentation.theme.GlassTone
+import com.rustamft.tasksft.presentation.theme.LocalGlassHazeState
 
 @Composable
 internal fun AppDialog(
@@ -35,6 +35,7 @@ internal fun AppDialog(
     onDismiss: () -> Unit,
     onPrimaryClick: () -> Unit,
     onSecondaryClick: () -> Unit = {},
+    primaryEnabled: Boolean = true,
 ) {
     if (LocalInspectionMode.current) {
         AppAlertDialogContent(
@@ -44,6 +45,7 @@ internal fun AppDialog(
             secondaryText = secondaryText,
             onPrimaryClick = onPrimaryClick,
             onSecondaryClick = onSecondaryClick,
+            primaryEnabled = primaryEnabled,
         )
     } else {
         Dialog(onDismissRequest = onDismiss) {
@@ -54,6 +56,7 @@ internal fun AppDialog(
                 secondaryText = secondaryText,
                 onPrimaryClick = onPrimaryClick,
                 onSecondaryClick = onSecondaryClick,
+                primaryEnabled = primaryEnabled,
             )
         }
     }
@@ -67,6 +70,7 @@ private fun AppAlertDialogContent(
     secondaryText: String?,
     onPrimaryClick: () -> Unit,
     onSecondaryClick: () -> Unit,
+    primaryEnabled: Boolean,
 ) {
     CompositionLocalProvider(LocalGlassHazeState provides null) {
         AppSurface(
@@ -80,7 +84,7 @@ private fun AppAlertDialogContent(
                 Text(
                     text = title,
                     color = AppTheme.glass.content,
-                    style = MaterialTheme.typography.h6,
+                    style = MaterialTheme.typography.titleLarge,
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
@@ -101,6 +105,7 @@ private fun AppAlertDialogContent(
                     AppTextButton(
                         text = primaryText,
                         onClick = onPrimaryClick,
+                        enabled = primaryEnabled,
                     )
                 }
             }
@@ -111,7 +116,7 @@ private fun AppAlertDialogContent(
 @Preview
 @Composable
 private fun AppDialogPreview(
-    @PreviewParameter(AppAlertDialogPreviewParameter::class) theme: Preferences.Theme,
+    @PreviewParameter(ThemePreviewProvider::class) theme: Preferences.Theme,
 ) {
     AppTheme(theme = theme) {
         AppDialog(
@@ -124,11 +129,4 @@ private fun AppDialogPreview(
             onSecondaryClick = {},
         )
     }
-}
-
-private class AppAlertDialogPreviewParameter : PreviewParameterProvider<Preferences.Theme> {
-    override val values = sequenceOf(
-        Preferences.Theme.Light,
-        Preferences.Theme.Dark,
-    )
 }

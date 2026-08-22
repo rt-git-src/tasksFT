@@ -1,23 +1,25 @@
 package com.rustamft.tasksft.presentation.screen.settings
 
-import android.net.Uri
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rustamft.tasksft.R
-import com.rustamft.tasksft.domain.model.Preferences.Theme
+import com.rustamft.tasksft.domain.model.Preferences
 import com.rustamft.tasksft.domain.usecase.ExportTasksUseCase
 import com.rustamft.tasksft.domain.usecase.GetPreferencesUseCase
 import com.rustamft.tasksft.domain.usecase.ImportTasksUseCase
 import com.rustamft.tasksft.domain.usecase.SavePreferencesUseCase
 import com.rustamft.tasksft.presentation.global.SnackbarFlow
 import com.rustamft.tasksft.presentation.model.UIText
+import com.rustamft.tasksft.presentation.screen.settings.model.SettingsEffect
+import com.rustamft.tasksft.presentation.screen.settings.model.SettingsUiState
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 internal class SettingsViewModel(
@@ -29,58 +31,43 @@ internal class SettingsViewModel(
     private val exceptionHandler: CoroutineExceptionHandler,
 ) : ViewModel() {
 
-    private val successChannel = Channel<Boolean>()
-    val successFlow = successChannel.receiveAsFlow()
-    val preferencesFlow = getPreferencesUseCase.execute()
-    val openExportConfirmDialogState = mutableStateOf(false)
+    private val preferencesFlow = getPreferencesUseCase.execute()
+    val uiState: StateFlow<SettingsUiState> = preferencesFlow
+        .map(::SettingsUiState)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = SettingsUiState(),
+        )
 
-    fun setTheme(theme: Theme) {
+    private val effectChannel = Channel<SettingsEffect>(Channel.BUFFERED)
+    val effects = effectChannel.receiveAsFlow()
+
+    fun setTheme(theme: Preferences.Theme) {
         viewModelScope.launch(exceptionHandler) {
+            savePreferencesUseCase.execute(preferencesFlow.first().copy(theme = theme))
+        }
+    }
+
+    fun exportTasks(directoryUri: String) {
+        viewModelScope.launch(exceptionHandler) {
+            exportTasksUseCase.execute(directoryUriString = directoryUri)
             savePreferencesUseCase.execute(
-                preferences = preferencesFlow.first().copy(theme = theme)
+                preferencesFlow.first().copy(backupDirectory = directoryUri),
             )
+            completeTransfer(UIText.StringResource(R.string.backup_file_exported))
         }
     }
 
-    fun exportTasks(directoryUri: Uri) {
-        launchInViewModelScope(
-            successMessage = UIText.StringResource(R.string.backup_file_exported)
-        ) {
-            listOf(
-                exportTasksUseCase.execute(directoryUriString = directoryUri.toString()),
-                savePreferencesUseCase.execute(
-                    preferences = preferencesFlow.first().copy(
-                        backupDirectory = directoryUri.toString()
-                    )
-                )
-            )
-        }
-    }
-
-    fun importTasks(fileUri: Uri) {
-        launchInViewModelScope(
-            successMessage = UIText.StringResource(R.string.backup_file_imported)
-        ) {
-            importTasksUseCase.execute(fileUriString = fileUri.toString())
-        }
-    }
-
-    private fun launchInViewModelScope(
-        successMessage: UIText? = null,
-        block: suspend CoroutineScope.() -> Unit,
-    ) {
-        launchInViewModelScope(successMessage, listOf(block))
-    }
-
-    private fun launchInViewModelScope(
-        successMessage: UIText? = null,
-        blocks: List<suspend CoroutineScope.() -> Unit>,
-    ) {
+    fun importTasks(fileUri: String) {
         viewModelScope.launch(exceptionHandler) {
-            val jobs = blocks.map { block -> launch { block() } }
-            jobs.joinAll()
-            successMessage?.let { snackbarFlow.emit(it) }
-            successChannel.send(true)
+            importTasksUseCase.execute(fileUriString = fileUri)
+            completeTransfer(UIText.StringResource(R.string.backup_file_imported))
         }
+    }
+
+    private suspend fun completeTransfer(message: UIText) {
+        snackbarFlow.emit(message)
+        effectChannel.send(SettingsEffect.NavigateBack)
     }
 }

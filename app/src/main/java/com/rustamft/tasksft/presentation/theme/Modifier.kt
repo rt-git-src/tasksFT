@@ -1,4 +1,4 @@
-package com.rustamft.tasksft.presentation.element
+package com.rustamft.tasksft.presentation.theme
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -10,11 +10,13 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
@@ -25,9 +27,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.rustamft.tasksft.presentation.theme.AppCardShape
-import com.rustamft.tasksft.presentation.theme.AppControlShape
-import com.rustamft.tasksft.presentation.theme.AppTheme
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
@@ -42,7 +41,7 @@ internal enum class GlassTone {
 internal val LocalGlassHazeState = staticCompositionLocalOf<HazeState?> { null }
 
 @Composable
-internal fun Modifier.appTheme(
+internal fun Modifier.glassSurface(
     shape: Shape = AppCardShape,
     tone: GlassTone = GlassTone.Regular,
     elevation: Dp = 8.dp,
@@ -111,15 +110,15 @@ internal fun Modifier.appTheme(
         val rimWidth = 1.dp.toPx()
         val glintBrush = Brush.linearGradient(
             colors = listOf(glass.highlight, Color.Transparent),
-            start = androidx.compose.ui.geometry.Offset.Zero,
-            end = androidx.compose.ui.geometry.Offset(size.width * 0.72f, size.height * 0.62f),
+            start = Offset.Zero,
+            end = Offset(size.width * 0.72f, size.height * 0.62f),
         )
         val sheenBrush = Brush.radialGradient(
             colors = listOf(
                 glass.highlight.copy(alpha = glass.highlight.alpha * 0.18f),
                 Color.Transparent,
             ),
-            center = androidx.compose.ui.geometry.Offset(size.width * 0.18f, 0f),
+            center = Offset(size.width * 0.18f, 0f),
             radius = maxOf(size.width, size.height) * 0.9f,
         )
         onDrawWithContent {
@@ -140,9 +139,9 @@ internal fun Modifier.appTheme(
 }
 
 @Composable
-internal fun Modifier.appThemeControl(
+internal fun Modifier.glassControl(
     shape: Shape = AppControlShape,
-): Modifier = appTheme(
+): Modifier = glassSurface(
     shape = shape,
     tone = GlassTone.Control,
     elevation = 0.dp,
@@ -155,13 +154,8 @@ internal fun Modifier.appPressable(
     role: Role? = null,
     pressedScale: Float = 0.97f,
 ): Modifier {
-    val interactionSource = androidx.compose.runtime.remember { MutableInteractionSource() }
-    val pressed by interactionSource.collectIsPressedAsState()
-    val scale by animateFloatAsState(
-        targetValue = if (pressed) pressedScale else 1f,
-        animationSpec = tween(durationMillis = 110),
-        label = "glassPressScale",
-    )
+    val interactionSource = remember { MutableInteractionSource() }
+    val scale = rememberPressedScale(interactionSource, pressedScale)
     val indication = LocalIndication.current
     return this
         .graphicsLayer {
@@ -184,13 +178,8 @@ internal fun Modifier.appToggleable(
     role: Role,
     pressedScale: Float = 0.97f,
 ): Modifier {
-    val interactionSource = androidx.compose.runtime.remember { MutableInteractionSource() }
-    val pressed by interactionSource.collectIsPressedAsState()
-    val scale by animateFloatAsState(
-        targetValue = if (pressed) pressedScale else 1f,
-        animationSpec = tween(durationMillis = 110),
-        label = "glassToggleScale",
-    )
+    val interactionSource = remember { MutableInteractionSource() }
+    val scale = rememberPressedScale(interactionSource, pressedScale)
     return this
         .graphicsLayer {
             scaleX = scale
@@ -203,4 +192,18 @@ internal fun Modifier.appToggleable(
             role = role,
             onValueChange = onValueChange,
         )
+}
+
+@Composable
+private fun rememberPressedScale(
+    interactionSource: MutableInteractionSource,
+    pressedScale: Float,
+): Float {
+    val pressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (pressed) pressedScale else 1f,
+        animationSpec = tween(durationMillis = 110),
+        label = "glassPressedScale",
+    )
+    return scale
 }

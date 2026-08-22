@@ -7,8 +7,8 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
-import androidx.core.view.WindowCompat
 import com.rustamft.tasksft.R
 import com.rustamft.tasksft.permission.isNotificationPermissionGranted
 import com.rustamft.tasksft.permission.requestNotificationPermission
@@ -17,7 +17,7 @@ import com.rustamft.tasksft.presentation.global.NOTIFICATION_CHANNEL_ID_TASK
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        enableEdgeToEdge()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannelIfNeeded()
         }
