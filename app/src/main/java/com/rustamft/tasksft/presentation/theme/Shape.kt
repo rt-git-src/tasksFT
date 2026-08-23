@@ -10,6 +10,5 @@ val Shapes = Shapes(
     large = RoundedCornerShape(26.dp),
 )
 
-val AppCardShape = RoundedCornerShape(22.dp)
-val AppBarShape = RoundedCornerShape(28.dp)
-val AppControlShape = RoundedCornerShape(14.dp)
+val AppCardShape = RoundedCornerShape(32.dp)
+val AppControlShape = RoundedCornerShape(16.dp)

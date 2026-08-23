@@ -34,8 +34,9 @@ internal fun AppColorButton(
         modifier = modifier
             .size(48.dp)
             .appPressable(
-                onClick = onClick,
+                shape = CircleShape,
                 role = Role.RadioButton,
+                onClick = onClick,
             )
             .semantics {
                 this.selected = selected

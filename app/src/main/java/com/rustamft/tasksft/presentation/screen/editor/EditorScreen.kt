@@ -170,11 +170,6 @@ internal fun EditorScreenContent(
     onSave: () -> Unit,
     onDelete: () -> Unit,
 ) {
-    val pickerDialogThemeResId = if (AppTheme.isDark) {
-        R.style.DateTimePickerDarkTheme
-    } else {
-        R.style.DateTimePickerLightTheme
-    }
     val fieldColors = TextFieldDefaults.colors(
         focusedTextColor = AppTheme.glass.content,
         unfocusedTextColor = AppTheme.glass.content,
@@ -287,7 +282,6 @@ internal fun EditorScreenContent(
             Spacer(modifier = Modifier.height(20.dp))
             ReminderSection(
                 uiState = uiState,
-                pickerDialogThemeResId = pickerDialogThemeResId,
                 repeatExpanded = repeatExpanded,
                 onRepeatExpandedChange = onRepeatExpandedChange,
                 onReminderEnabledChange = onReminderEnabledChange,
@@ -301,7 +295,6 @@ internal fun EditorScreenContent(
 @Composable
 private fun ReminderSection(
     uiState: EditorUiState,
-    pickerDialogThemeResId: Int,
     repeatExpanded: Boolean,
     onRepeatExpandedChange: (Boolean) -> Unit,
     onReminderEnabledChange: (Boolean) -> Unit,
@@ -350,13 +343,13 @@ private fun ReminderSection(
                 ReminderControlRow(
                     iconResId = R.drawable.ic_event,
                     label = stringResource(R.string.reminder_date),
-                ) {
-                    AppDatePicker(
-                        value = uiState.reminderEpochMillis,
-                        onValueChange = onReminderChange,
-                        themeResId = pickerDialogThemeResId,
-                    )
-                }
+                    control = {
+                        AppDatePicker(
+                            value = uiState.reminderEpochMillis,
+                            onValueChange = onReminderChange,
+                        )
+                    },
+                )
                 ReminderDivider()
                 ReminderControlRow(
                     iconResId = R.drawable.ic_time,
@@ -365,7 +358,6 @@ private fun ReminderSection(
                     AppTimePicker(
                         value = uiState.reminderEpochMillis,
                         onValueChange = onReminderChange,
-                        themeResId = pickerDialogThemeResId,
                     )
                 }
                 ReminderDivider()
@@ -377,8 +369,8 @@ private fun ReminderSection(
                         modifier = Modifier.testTag(TAG_EDITOR_SCREEN_REPEAT),
                         itemToName = reminderRepeatNames,
                         value = uiState.reminderRepeat,
-                        onValueChange = onReminderRepeatChange,
                         expanded = repeatExpanded,
+                        onValueChange = onReminderRepeatChange,
                         onExpandedChange = onRepeatExpandedChange,
                     )
                 }
@@ -389,14 +381,13 @@ private fun ReminderSection(
 
 @Composable
 private fun ReminderControlRow(
+    modifier: Modifier = Modifier,
     iconResId: Int,
     label: String,
     control: @Composable () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(

@@ -4,16 +4,25 @@ import android.app.TimePickerDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import com.rustamft.tasksft.R
+import com.rustamft.tasksft.domain.model.Preferences
 import com.rustamft.tasksft.presentation.global.format
+import com.rustamft.tasksft.presentation.preview.ThemePreviewProvider
+import com.rustamft.tasksft.presentation.theme.AppTheme
 import java.util.Calendar
 
 @Composable
 internal fun AppTimePicker(
+    modifier: Modifier = Modifier,
     value: Long,
     onValueChange: (Long) -> Unit,
-    themeResId: Int,
-    modifier: Modifier = Modifier,
 ) {
+    val themeResId = when {
+        AppTheme.isDark -> R.style.DateTimePickerDarkTheme
+        else -> R.style.DateTimePickerLightTheme
+    }
     val calendar = Calendar.getInstance().apply { timeInMillis = value }
     val dialog = TimePickerDialog(
         LocalContext.current,
@@ -37,4 +46,17 @@ internal fun AppTimePicker(
         }",
         onClick = dialog::show,
     )
+}
+
+@Preview
+@Composable
+private fun AppTimePickerPreview(
+    @PreviewParameter(ThemePreviewProvider::class) theme: Preferences.Theme,
+) {
+    AppTheme(theme = theme) {
+        AppTimePicker(
+            value = 0,
+            onValueChange = {},
+        )
+    }
 }

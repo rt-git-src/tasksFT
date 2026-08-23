@@ -38,7 +38,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -71,7 +70,6 @@ import com.rustamft.tasksft.presentation.screen.settings.model.SettingsEffect
 import com.rustamft.tasksft.presentation.screen.settings.model.SettingsUiState
 import com.rustamft.tasksft.presentation.theme.AppControlShape
 import com.rustamft.tasksft.presentation.theme.AppTheme
-import com.rustamft.tasksft.presentation.theme.Shapes
 import com.rustamft.tasksft.presentation.theme.appPressable
 import org.koin.androidx.compose.koinViewModel
 
@@ -270,7 +268,7 @@ private fun ThemeSelector(
                 modifier = Modifier.testTag(tag),
                 selected = selected,
                 onClick = { if (!selected) onThemeSelected(theme) },
-                shape = SegmentedButtonDefaults.itemShape(index, options.size, Shapes.small),
+                shape = SegmentedButtonDefaults.itemShape(index, options.size, AppControlShape),
                 colors = SegmentedButtonDefaults.colors(
                     activeContainerColor = AppTheme.glass.accent,
                     activeContentColor = Color.White,
@@ -301,9 +299,12 @@ private fun SettingsActionRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(AppControlShape)
-            .appPressable(onClick = onClick, pressedScale = 0.99f)
-            .padding(vertical = 14.dp),
+            .appPressable(
+                shape = AppControlShape,
+                pressedScale = 0.99f,
+                onClick = onClick,
+            )
+            .padding(horizontal = 8.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(

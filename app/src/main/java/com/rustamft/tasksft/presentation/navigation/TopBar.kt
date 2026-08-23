@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -26,7 +27,6 @@ import com.rustamft.tasksft.R
 import com.rustamft.tasksft.domain.model.Preferences
 import com.rustamft.tasksft.presentation.element.AppSurface
 import com.rustamft.tasksft.presentation.preview.ThemePreviewProvider
-import com.rustamft.tasksft.presentation.theme.AppBarShape
 import com.rustamft.tasksft.presentation.theme.AppTheme
 import com.rustamft.tasksft.presentation.theme.GlassTone
 
@@ -48,13 +48,13 @@ internal fun TopBar(
                 .fillMaxWidth()
                 .widthIn(min = 224.dp)
                 .windowInsetsPadding(WindowInsets.statusBars),
-            shape = AppBarShape,
+            shape = CircleShape,
             tone = GlassTone.Strong,
             elevation = 12.dp,
             contentPadding = PaddingValues(0.dp),
         ) {
             CenterAlignedTopAppBar(
-                modifier = Modifier.padding(horizontal = 4.dp),
+                modifier = Modifier.padding(horizontal = 6.dp),
                 windowInsets = WindowInsets(),
                 title = {
                     Text(
@@ -70,11 +70,11 @@ internal fun TopBar(
                 },
                 actions = {
                     items.forEach { item ->
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
                         TopBarIcon(item)
                     }
                     if (dropdownItems.isNotEmpty()) {
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
                         TopBarDropdown(items = dropdownItems)
                     }
                 },

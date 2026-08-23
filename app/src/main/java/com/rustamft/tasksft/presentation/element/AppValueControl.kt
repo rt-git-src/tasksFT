@@ -15,19 +15,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.rustamft.tasksft.R
+import com.rustamft.tasksft.presentation.theme.AppControlShape
 import com.rustamft.tasksft.presentation.theme.AppTheme
 import com.rustamft.tasksft.presentation.theme.appPressable
 
 @Composable
 internal fun AppValueControl(
+    modifier: Modifier = Modifier,
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .heightIn(min = 48.dp)
-            .appPressable(onClick = onClick)
+            .appPressable(
+                shape = AppControlShape,
+                onClick = onClick,
+            )
             .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

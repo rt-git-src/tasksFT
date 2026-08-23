@@ -149,15 +149,17 @@ internal fun Modifier.glassControl(
 
 @Composable
 internal fun Modifier.appPressable(
-    onClick: () -> Unit,
+    shape: Shape,
     enabled: Boolean = true,
     role: Role? = null,
     pressedScale: Float = 0.97f,
+    onClick: () -> Unit,
 ): Modifier {
     val interactionSource = remember { MutableInteractionSource() }
     val scale = rememberPressedScale(interactionSource, pressedScale)
     val indication = LocalIndication.current
     return this
+        .clip(shape)
         .graphicsLayer {
             scaleX = scale
             scaleY = scale

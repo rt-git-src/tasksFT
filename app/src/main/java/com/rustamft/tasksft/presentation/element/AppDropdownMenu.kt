@@ -19,12 +19,12 @@ import com.rustamft.tasksft.presentation.theme.glassSurface
 
 @Composable
 internal fun <T> AppDropdownMenu(
+    modifier: Modifier = Modifier,
     itemToName: Map<T, UIText>,
     value: T,
-    onValueChange: (T) -> Unit,
     expanded: Boolean,
+    onValueChange: (T) -> Unit,
     onExpandedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.wrapContentSize()) {
         AppValueControl(

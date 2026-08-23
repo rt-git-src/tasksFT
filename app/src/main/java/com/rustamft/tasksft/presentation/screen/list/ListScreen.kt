@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -79,6 +80,7 @@ import com.rustamft.tasksft.presentation.navigation.TopBar
 import com.rustamft.tasksft.presentation.preview.ThemePreviewProvider
 import com.rustamft.tasksft.presentation.screen.editor.model.ReminderRepeat
 import com.rustamft.tasksft.presentation.screen.list.model.ListUiState
+import com.rustamft.tasksft.presentation.theme.AppCardShape
 import com.rustamft.tasksft.presentation.theme.AppTheme
 import com.rustamft.tasksft.presentation.theme.appPressable
 import com.rustamft.tasksft.presentation.theme.appToggleable
@@ -218,7 +220,11 @@ private fun TaskCard(
     AppSurface(
         modifier = Modifier
             .fillMaxWidth()
-            .appPressable(onClick = onOpen, pressedScale = 0.99f)
+            .appPressable(
+                shape = AppCardShape,
+                pressedScale = 0.99f,
+                onClick = onOpen,
+            )
             .testTag(TAG_LIST_SCREEN_TASK_CARD),
         elevation = 8.dp,
     ) {
@@ -240,34 +246,13 @@ private fun TaskCard(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(11.dp))
-                        .appToggleable(
-                            value = task.finished,
-                            role = Role.Checkbox,
-                            onValueChange = onFinishedChange,
-                        )
-                        .semantics { contentDescription = finishedDescription }
-                        .testTag(TAG_LIST_SCREEN_TASK_CHECKBOX)
-                        .padding(4.dp)
-                        .border(2.dp, accent, RoundedCornerShape(9.dp))
-                        .background(
-                            if (task.finished) accent else Color.Transparent,
-                            RoundedCornerShape(9.dp),
-                        ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    if (task.finished) {
-                        Icon(
-                            modifier = Modifier.size(28.dp),
-                            painter = painterResource(R.drawable.ic_done),
-                            contentDescription = null,
-                            tint = Color.White,
-                        )
-                    }
-                }
+                CheckBox(
+                    shape = CircleShape,
+                    accent = accent,
+                    finished = task.finished,
+                    finishedDescription = finishedDescription,
+                    onFinishedChange = onFinishedChange,
+                )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
@@ -284,7 +269,11 @@ private fun TaskCard(
                     )
                     if (task.reminder != 0L) {
                         Spacer(modifier = Modifier.height(6.dp))
-                        TaskMetadata(task = task, accent = accent)
+                        TaskMetadata(
+                            accent = accent,
+                            reminder = task.reminder,
+                            repeatCalendarUnit = task.repeatCalendarUnit,
+                        )
                     }
                 }
                 Spacer(modifier = Modifier.width(8.dp))
@@ -300,10 +289,56 @@ private fun TaskCard(
 }
 
 @Composable
-private fun TaskMetadata(task: Task, accent: Color) {
-    val dateTime = task.reminder.toDateTime()
+private fun CheckBox(
+    shape: Shape,
+    accent: Color,
+    finished: Boolean,
+    finishedDescription: String,
+    onFinishedChange: (Boolean) -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .size(48.dp)
+            .clip(shape)
+            .appToggleable(
+                value = finished,
+                role = Role.Checkbox,
+                onValueChange = onFinishedChange,
+            )
+            .semantics { contentDescription = finishedDescription }
+            .testTag(TAG_LIST_SCREEN_TASK_CHECKBOX)
+            .padding(4.dp)
+            .border(
+                width = 2.dp,
+                color = accent,
+                shape = shape,
+            )
+            .background(
+                color = if (finished) accent else Color.Transparent,
+                shape = shape,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (finished) {
+            Icon(
+                modifier = Modifier.size(28.dp),
+                painter = painterResource(R.drawable.ic_done),
+                contentDescription = null,
+                tint = Color.White,
+            )
+        }
+    }
+}
+
+@Composable
+private fun TaskMetadata(
+    accent: Color,
+    reminder: Long,
+    repeatCalendarUnit: Int,
+) {
+    val dateTime = reminder.toDateTime()
     val repeat = ReminderRepeat.entries.firstOrNull {
-        it.calendarUnit == task.repeatCalendarUnit && it != ReminderRepeat.NONE
+        it.calendarUnit == repeatCalendarUnit && it != ReminderRepeat.NONE
     }
     Row(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -316,7 +351,7 @@ private fun TaskMetadata(task: Task, accent: Color) {
             tint = accent,
         )
         Text(
-            text = task.reminder.reminderText(dateTime.date, dateTime.time),
+            text = reminder.reminderText(dateTime.date, dateTime.time),
             color = accent,
             style = MaterialTheme.typography.bodySmall,
         )
