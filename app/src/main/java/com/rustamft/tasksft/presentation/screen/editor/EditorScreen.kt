@@ -250,8 +250,7 @@ internal fun EditorScreenContent(
                 value = uiState.description,
                 onValueChange = onDescriptionChange,
                 label = { Text(text = stringResource(R.string.task_description)) },
-                minLines = 2,
-                maxLines = 4,
+                maxLines = 10,
                 shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
                 colors = fieldColors,
             )
